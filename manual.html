@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manual d'ús · Gestió de Curs</title>
+<style>
+  :root {
+    --garnet-deep: #4A1520;
+    --crimson: #C01E4B;
+    --garnet-text: #7A1E2E;
+    --garnet-mid: #A63050;
+    --garnet-soft: #FBEAED;
+    --garnet-soft2: #F5D0D6;
+    --bg: #FAF7F8;
+    --card: #FFFFFF;
+    --border: #EADFE2;
+    --text: #2A2124;
+    --text-muted: #8A7F82;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    font-size: 15px;
+  }
+  .layout { display: flex; max-width: 1200px; margin: 0 auto; }
+
+  /* Índex lateral */
+  .toc {
+    width: 270px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    background: var(--garnet-deep);
+    color: #fff;
+    padding: 28px 20px;
+  }
+  .toc h2 {
+    font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.5); margin-bottom: 14px; font-weight: 700;
+  }
+  .toc a {
+    display: block; color: rgba(255,255,255,0.82); text-decoration: none;
+    padding: 5px 10px; border-radius: 6px; font-size: 13.5px; margin-bottom: 1px;
+    transition: background 0.15s, color 0.15s;
+  }
+  .toc a:hover { background: rgba(255,255,255,0.1); color: #fff; }
+  .toc a.sub { padding-left: 22px; font-size: 12.5px; color: rgba(255,255,255,0.6); }
+  .toc-brand {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 24px;
+    padding-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,0.12);
+  }
+  .toc-brand-icon {
+    width: 38px; height: 38px; background: #000; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .toc-brand-icon svg { width: 22px; height: 22px; }
+  .toc-brand-title { font-size: 14px; font-weight: 800; line-height: 1.2; }
+  .toc-brand-sub { font-size: 11px; color: rgba(255,255,255,0.5); }
+
+  /* Contingut */
+  .content { flex: 1; padding: 48px 56px; max-width: 860px; }
+  .doc-header { margin-bottom: 40px; padding-bottom: 28px; border-bottom: 3px solid var(--garnet-soft); }
+  .doc-header h1 { font-size: 34px; color: var(--garnet-deep); font-weight: 800; line-height: 1.15; margin-bottom: 8px; }
+  .doc-header .subtitle { font-size: 16px; color: var(--text-muted); }
+  .doc-header .version { display: inline-block; margin-top: 14px; font-size: 12px; background: var(--garnet-soft); color: var(--garnet-text); padding: 4px 12px; border-radius: 20px; font-weight: 700; }
+
+  section { margin-bottom: 44px; scroll-margin-top: 20px; }
+  section h2 {
+    font-size: 24px; color: var(--garnet-deep); font-weight: 800;
+    margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--border);
+  }
+  section h3 {
+    font-size: 18px; color: var(--garnet-text); font-weight: 700;
+    margin: 26px 0 10px;
+  }
+  section h4 { font-size: 15.5px; color: var(--crimson); font-weight: 700; margin: 18px 0 6px; }
+  p { margin-bottom: 12px; }
+  ul, ol { margin: 0 0 14px 22px; }
+  li { margin-bottom: 6px; }
+  strong { color: var(--garnet-text); font-weight: 700; }
+  code {
+    background: var(--garnet-soft); color: var(--garnet-text);
+    padding: 1px 6px; border-radius: 4px; font-size: 13px;
+    font-family: 'SF Mono', Consolas, monospace;
+  }
+
+  .callout {
+    background: var(--garnet-soft); border-left: 4px solid var(--crimson);
+    padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 16px 0;
+  }
+  .callout strong { color: var(--garnet-deep); }
+  .callout.warn { background: #FEF3C7; border-left-color: #D97706; }
+  .callout.warn strong { color: #92400E; }
+  .callout.tip { background: #E0F2FE; border-left-color: #0284C7; }
+  .callout.tip strong { color: #075985; }
+
+  .step-list { counter-reset: step; list-style: none; margin-left: 0; }
+  .step-list li {
+    position: relative; padding-left: 40px; margin-bottom: 12px;
+  }
+  .step-list li::before {
+    counter-increment: step; content: counter(step);
+    position: absolute; left: 0; top: 0;
+    width: 26px; height: 26px; background: var(--crimson); color: #fff;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+  }
+
+  .badge {
+    display: inline-block; font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 5px; vertical-align: middle;
+  }
+  .badge-pi { background: #2563EB; color: #fff; }
+  .badge-am { background: #EA580C; color: #fff; }
+  .badge-med { background: var(--garnet-soft); color: var(--garnet-text); }
+
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+  th { background: var(--garnet-soft); color: var(--garnet-text); text-align: left; padding: 9px 12px; font-weight: 700; }
+  td { padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+
+  .feature-icon { color: var(--crimson); font-weight: 700; }
+
+  @media print {
+    .toc { display: none; }
+    .content { padding: 20px; max-width: 100%; }
+    body { font-size: 12px; }
+    section { page-break-inside: avoid; }
+  }
+  @media (max-width: 800px) {
+    .toc { display: none; }
+    .content { padding: 28px 22px; }
+  }
+
+  /* Cercador de l'índex */
+  .toc-search {
+    width: 100%; margin-bottom: 14px; padding: 7px 11px;
+    border: 1px solid rgba(255,255,255,0.18); border-radius: 7px;
+    background: rgba(255,255,255,0.08); color: #fff;
+    font-family: inherit; font-size: 13px;
+  }
+  .toc-search::placeholder { color: rgba(255,255,255,0.45); }
+  .toc-search:focus { outline: 2px solid var(--crimson); outline-offset: 1px; background: rgba(255,255,255,0.14); }
+  .toc a.oculta { display: none; }
+  .toc-cap-res { color: rgba(255,255,255,0.5); font-size: 12.5px; padding: 6px 10px; display: none; }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ÍNDEX -->
+  <nav class="toc">
+    <div class="toc-brand">
+      <div class="toc-brand-icon">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M6 4h9l4 4v12H6z" stroke="#C01E4B" stroke-width="1.5"/><path d="M9 13l2 2 4-4" stroke="#C01E4B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div>
+        <div class="toc-brand-title">Manual d'ús</div>
+        <div class="toc-brand-sub">Gestió de Curs</div>
+      </div>
+    </div>
+    <label for="tocSearch" class="visually-hidden" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Cercar al manual</label>
+    <input class="toc-search" id="tocSearch" type="search" placeholder="Cercar… (ex: seients, actitud)" autocomplete="off">
+    <h2>Índex</h2>
+    <div class="toc-cap-res" id="tocCapRes">Cap apartat no en parla.</div>
+    <a href="#intro">1. Introducció</a>
+    <a href="#primers">2. Primers passos</a>
+    <a href="#config" class="sub">Connectar l'app</a>
+    <a href="#config-llistes" class="sub">Les llistes i les fitxes s'omplen soles</a>
+    <a href="#config-dubtes" class="sub">Alumnes amb dades que no acaben de sortir</a>
+    <a href="#config-pendents" class="sub">Quan una cosa no s'ha pogut desar</a>
+    <a href="#teclat" class="sub">Fer-la servir amb el teclat</a>
+    <a href="#adreca" class="sub">Tornar on eres</a>
+    <a href="#dades-velles" class="sub">Quan el que veus pot no estar al dia</a>
+    <a href="#instalar" class="sub">Instal·lar-la</a>
+    <a href="#navegacio" class="sub">Com moure's</a>
+    <a href="#perfil">3. El meu perfil</a>
+    <a href="#perfil-especialista" class="sub">Si ets especialista</a>
+    <a href="#perfil-direccio" class="sub">Si ets de direcció</a>
+    <a href="#horari">4. Horari</a>
+    <a href="#horari-pdf" class="sub">Omplir-lo amb el PDF de l&#39;escola</a>
+    <a href="#inici">5. Inici</a>
+    <a href="#inici-millores" class="sub">Possibles actualitzacions</a>
+    <a href="#planning">6. Planning setmanal</a>
+    <a href="#calendari">7. Calendari mensual</a>
+    <a href="#categories" class="sub">Categories i llegenda</a>
+    <a href="#agendar" class="sub">Per agendar</a>
+    <a href="#tasques">8. Tasques</a>
+    <a href="#google">9. Enviar-ho al meu Google</a>
+    <a href="#alumnes">10. Alumnes</a>
+    <a href="#alumnes-direccio" class="sub">Direcció: triar el grup</a>
+    <a href="#dades" class="sub">Dades i PI/AM</a>
+    <a href="#contactes" class="sub">Els contactes de la família</a>
+    <a href="#dubtes" class="sub">Coses del document que no ha col·locat</a>
+    <a href="#seient-cond" class="sub">Condicions de seient</a>
+    <a href="#fitxa" class="sub">Fitxa de l'alumne</a>
+    <a href="#entrevistes" class="sub">Entrevistes amb la família</a>
+    <a href="#docents">11. Docents</a>
+    <a href="#docents-llistat" class="sub">Llistat de docents</a>
+    <a href="#docents-cercar" class="sub">Trobar algú de pressa</a>
+    <a href="#docents-alumnes" class="sub">Del docent als seus alumnes</a>
+    <a href="#docents-coordinacio" class="sub">Coordinació: els esmorzars</a>
+    <a href="#docents-torn" class="sub">Qui li toca la setmana que ve</a>
+    <a href="#docents-palmares" class="sub">El palmarès</a>
+    <a href="#docents-registres" class="sub">Registres de docents</a>
+    <a href="#docents-seg-entrevistes" class="sub">Seguiment d'entrevistes</a>
+    <a href="#observacions">12. Observacions</a>
+    <a href="#obs-moure" class="sub">Corregir-ne una de mal posada</a>
+    <a href="#assignatures">13. Notes d'assignatures</a>
+    <a href="#coment-activitat" class="sub">Comentari per activitat</a>
+    <a href="#notes-compartir" class="sub">Compartir amb el tutor</a>
+    <a href="#actitud" class="sub">Actitud</a>
+    <a href="#carpeta" class="sub">Carpeta Viatgera</a>
+    <a href="#assoliments">14. Assoliments</a>
+    <a href="#registres">15. Registres d'aula</a>
+    <a href="#grups">16. Generador de grups</a>
+    <a href="#seients">17. Distribució de l'aula</a>
+    <a href="#postits">18. Notes i post-its</a>
+    <a href="#postits-llistes" class="sub">Llistes de coses a fer</a>
+    <a href="#comentaris">19. Generador de comentaris</a>
+    <a href="#objectius" class="sub">Els meus objectius</a>
+    <a href="#importar" class="sub">Importar-los d'un document</a>
+    <a href="#copiar" class="sub">Copiar-los d'una altra</a>
+    <a href="#estil" class="sub">La meva manera d'escriure</a>
+    <a href="#apunts" class="sub">Apunts de les activitats</a>
+    <a href="#reunions">20. Convocar reunions</a>
+    <a href="#reunions-crear" class="sub">Crear-ne un</a>
+    <a href="#reunions-enllac" class="sub">Enviar l'enllaç</a>
+    <a href="#reunions-treure" class="sub">Treure una hora</a>
+    <a href="#reunions-solapar" class="sub">Que no se solapin</a>
+    <a href="#reunions-afegir" class="sub">Afegir hores després</a>
+    <a href="#reunions-missatge" class="sub">El missatge de confirmació</a>
+    <a href="#reunions-gestionar" class="sub">Veure les reserves</a>
+    <a href="#vedrunu">21. Vedrunu, l'assistent</a>
+    <a href="#personalitzar">22. Personalitzar l'app</a>
+    <a href="#notificacions">23. Notificacions</a>
+    <a href="#sync">24. Sincronització i versions</a>
+    <a href="#esperar" class="sub">Quan l&#39;app està carregant</a>
+    <a href="#trucs">25. Preguntes freqüents</a>
+  </nav>
+
+  <!-- CONTINGUT -->
+  <main class="content">
+    <div class="doc-header">
+      <h1>Manual d'ús complet</h1>
+      <div class="subtitle">Aplicació de Gestió de Curs — Educació Primària</div>
+      <div class="version">Vedruna Escorial Vic</div>
+    </div>
+
+    <!-- 1. INTRODUCCIÓ -->
+    <section id="intro">
+      <h2>1. Introducció</h2>
+      <p>Aquesta aplicació és una eina de gestió pensada per al dia a dia d'una aula de primària. Reuneix en un sol lloc la planificació setmanal, el calendari, les tasques pendents, la informació dels alumnes, les qualificacions, els assoliments, les observacions i diverses eines d'ajuda com els generadors de grups i de comentaris d'informe.</p>
+      <p>Totes les dades es desen automàticament al teu <strong>Google Sheets</strong>, de manera que pots treballar des de qualsevol dispositiu (ordinador de casa, portàtil de l'escola, mòbil) i sempre veuràs la mateixa informació actualitzada.</p>
+      <div class="callout tip">
+        <strong>És una PWA:</strong> pots instal·lar l'app a la pantalla d'inici del mòbil o de l'ordinador i s'obrirà com una aplicació nativa, amb la seva pròpia icona.
+      </div>
+      <div class="callout">
+        <strong>Hi ha dues versions de l'app</strong>, i sota el logo hi diu quina tens: <strong>Gestió de curs · Tutors</strong> o <strong>Gestió de curs · Especialistes</strong>. Funcionen igual; el que canvia és que la dels especialistes no demana de quin grup ets tutor/a, sinó a quins grups fas classe, i no hi surten les eines que només tenen sentit amb un grup propi. Si tens la que no et toca, digues-ho a en Pol i te'n passarà l'enllaç bo.
+      </div>
+      <div class="callout">
+        <strong>L'app s'adapta a tu, no al revés.</strong> Els objectius d'avaluació, els aspectes d'actitud, la teva manera d'escriure els comentaris, les categories del calendari i els enllaços de la portada <strong>els configures tu</strong> des de dins de l'app. Res d'això ve imposat. Ho tens tot recollit a l'apartat <a href="#personalitzar">Personalitzar l'app</a>.
+      </div>
+      <div class="callout tip">
+        <strong>Busques una cosa concreta?</strong> A l'ordinador tens un cercador a dalt de l'índex: escriu-hi una paraula («seients», «actitud», «festius») i et deixarà només els apartats que en parlen. Al mòbil, com que no hi cap l'índex, fes servir la cerca del navegador.
+      </div>
+    </section>
+
+    <!-- 2. PRIMERS PASSOS -->
+    <section id="primers">
+      <h2>2. Primers passos</h2>
+
+      <h3 id="config">Connectar l'app</h3>
+      <p>L'app ha d'estar connectada amb el teu Google Sheets. Normalment ja te la deixaran connectada; només ho hauràs de fer tu si entres des d'un dispositiu nou. Clica la icona de <strong>Configuració</strong>, al peu del menú lateral, i:</p>
+      <ol class="step-list">
+        <li>Enganxa la <strong>URL</strong> que et donin (acaba sempre en <code>/exec</code>).</li>
+        <li>Clica <strong>Connectar</strong>.</li>
+      </ol>
+      <div class="callout">
+        <strong>La resta és automàtic.</strong> En connectar per primera vegada, l'app crea sola les pestanyes que li calen, protegeix els fulls i ajusta les columnes. No has de clicar cap botó de manteniment.
+      </div>
+      <div class="callout">
+        <strong>On es guarda?</strong> La URL es desa només al teu dispositiu, així que la configuraràs un cop per cada dispositiu que facis servir. Les dades dels alumnes viuen sempre al Google Sheets, mai al dispositiu.
+      </div>
+      <p>Al peu del menú també hi tens l'enllaç <strong>Full de càlcul</strong>, que t'obre directament el teu Sheets per si mai hi vols veure les dades en cru.</p>
+
+      <h3 id="config-llistes">Les llistes i les fitxes s&#39;omplen soles</h3>
+      <p><strong>No has de teclejar cap alumne.</strong> Els noms, cognoms i dates de naixement surten de les llistes oficials de l&#39;escola i arriben sols al full que llegeix l&#39;app. Si l&#39;escola d&oacute;na d&#39;alta un alumne nou, al cap d&#39;una estona el tindr&agrave;s a la teva llista sense fer res.</p>
+      <p>Es comprova <strong>cada quart d&#39;hora</strong>, i val tant per a les <strong>llistes d&#39;alumnes</strong> com per al document d&#39;<strong>aspectes generals del grup</strong>: si hi treus o hi canvies alguna cosa, al cap d&#39;una estona ho veur&agrave;s a les fitxes dels alumnes.</p>
+      <div class="callout tip">
+        <strong>No esborra res.</strong> Nom&eacute;s afegeix els alumnes que falten. Cada alumne conserva sempre les seves observacions, entrevistes, PI i condicions de seient, encara que canvi&iuml; de lloc a la llista.
+      </div>
+      <p>La llista et surt <strong>sempre per ordre alfab&egrave;tic del primer cognom</strong>, i es torna a ordenar sola cada cop que hi entren alumnes nous. No l&#39;has d&#39;ordenar tu.</p>
+      <div class="callout warn">
+        Si un alumne <strong>ja no surt</strong> a la llista de l&#39;escola (ha marxat, ha canviat de classe), l&#39;app <strong>no l&#39;esborra</strong>: &eacute;s a posta, perqu&egrave; aquell alumne pot tenir observacions i entrevistes que potser encara vols.
+      </div>
+      <div class="callout">
+        Si algun dia veus que fa dies que no s&#39;actualitza, <strong>av&iacute;sa en Pol</strong>: aix&ograve; es porta des de fora de l&#39;app.
+      </div>
+
+      <h3 id="config-dubtes">Alumnes amb dades que no acaben de sortir</h3>
+      <p>Al document de fitxes de grup, molts alumnes hi surten <strong>pel nom de pila</strong>. Quan al grup n&#39;hi ha <strong>dos que es diuen igual</strong> —dues Arlet, dos Kai, dues Gales— l&#39;app <strong>no n&#39;endevina cap</strong>, i les dades d&#39;aquell alumne es queden sense posar.</p>
+      <div class="callout tip">
+        <strong>&Eacute;s a posta.</strong> Val m&eacute;s que falti un PI que no pas que surti a la fitxa del nen equivocat: un PI que falta, es veu; un PI mal posat, no el va a comprovar ning&uacute;.
+      </div>
+      <p>Si veus un alumne a qui li falten dades que s&iacute; que s&oacute;n al document, <strong>digue-l&#39;hi a en Pol</strong> amb el nom i el grup. Es diu un cop i queda dit per sempre, per a tota l&#39;escola.</p>
+
+
+      <h3 id="config-pendents">Quan una cosa no s&#39;ha pogut desar</h3>
+      <p>A baix de tot, a l&#39;esquerra, hi ha un rètol que diu com va la connexió amb el full. Normalment hi diu <strong>«Sincronitzat»</strong> amb un punt verd.</p>
+      <p>Si en algun moment el full no respon —el wifi de l&#39;escola, un mal moment de Google— el rètol passa a dir <strong>«1 canvi sense desar»</strong> (o els que siguin) i surt un avís. Vol dir exactament això: <strong>ho tens escrit a la pantalla però encara no és al full</strong>.</p>
+      <div class="callout tip">
+        <strong>No has de fer res.</strong> L&#39;app s&#39;ho apunta i ho torna a provar sola quan torna la connexió; també si tanques l&#39;app i la tornes a obrir més tard. Quan ho aconsegueix, t&#39;ho diu i el rètol torna a dir «Sincronitzat».
+      </div>
+      <div class="callout warn">
+        <strong>El que sí que has de fer és no fiar-te&#39;n si diu que hi ha canvis sense desar.</strong> Mentre hi siguin, aquell planning o aquelles tasques només són en aquest ordinador: no els veuràs des del mòbil ni des d&#39;un altre lloc. Si el rètol s&#39;hi queda molta estona, digues-ho en Pol.
+      </div>
+
+      <h3 id="teclat">Fer-la servir amb el teclat</h3>
+      <p>Tota l&#39;app es pot fer servir sense ratolí. Amb el <strong>tabulador</strong> vas d&#39;un control al següent i amb <strong>Enter</strong> (o la barra d&#39;espai) el prems, també a les caselles de l&#39;<strong>Horari</strong>, del <strong>Planning</strong> i del <strong>Calendari</strong>.</p>
+      <ul>
+        <li>Quan s&#39;obre una finestra, el cursor hi entra i <strong>s&#39;hi queda</strong>: tabulant no te&#39;n vas a la pàgina de darrere.</li>
+        <li><strong>Escape</strong> tanca la finestra, i el cursor torna exactament on era. També tanca el <strong>menú del mòbil</strong> i el panell d'<strong>en Vedrunu</strong>.</li>
+      </ul>
+
+      <h3 id="adreca">Tornar on eres</h3>
+      <p>L'apartat on ets queda escrit a l'adreça de dalt. Si <strong>refresques</strong> la pàgina (F5), o si el navegador del mòbil refà la pestanya tot sol, <strong>hi tornes</strong>: abans sempre acabaves a la portada.</p>
+      <div class="callout tip">
+        Això vol dir que et pots desar l'adreça d'un apartat a les preferides —el planning, els registres— i obrir-la directament.
+      </div>
+
+      <h3 id="dades-velles">Quan el que veus pot no estar al dia</h3>
+      <p>Si el servidor no respon però el navegador encara té les dades de l'últim cop, l'app <strong>te les ensenya igualment</strong> perquè les puguis consultar. En aquest cas surt una franja a dalt que diu que <strong>el que veus és del darrer cop</strong>, amb un botó de <strong>«Torna-ho a provar»</strong>.</p>
+      <div class="callout warn">
+        Mentre hi sigui la franja, <strong>no et refiïs del que hi ha escrit</strong>: pot ser de fa dies. El que escriguis quedarà esperant en aquest navegador fins que torni la connexió. Quan torna, la franja se'n va sola.
+      </div>
+
+      <h3 id="instalar">Instal·lar-la com a app</h3>
+      <p>L'aplicació és una <strong>PWA</strong>: es pot instal·lar al mòbil o a l'ordinador com si fos una app nativa, amb la seva icona i sense la barra del navegador.</p>
+      <ul>
+        <li><strong>Android (Chrome):</strong> obre l'app i, al menú del navegador (⋮), tria <strong>«Instal·lar aplicació»</strong>.</li>
+        <li><strong>Ordinador (Chrome/Edge):</strong> apareix una icona d'instal·lació a la barra d'adreces.</li>
+        <li><strong>iPhone (Safari):</strong> botó de compartir → «Afegir a la pantalla d'inici».</li>
+      </ul>
+      <div class="callout">
+        Un cop instal·lada funciona també sense connexió, per consultar les últimes dades carregades. Al mòbil, el botó <strong>«enrere»</strong> et porta a la pantalla d'Inici en comptes de tancar l'app.
+      </div>
+
+      <h3 id="navegacio">Com moure's per l'app</h3>
+      <p>El <strong>menú lateral</strong> (a l'esquerra) està dividit així:</p>
+      <ul>
+        <li>A dalt de tot, <strong>el teu perfil</strong>.</li>
+        <li><strong>General:</strong> Inici, Horari, Planning setmanal, Calendari mensual, Tasques, Alumnes, Observacions, Assoliments i Registres d'aula.</li>
+        <li><strong>Assignatures:</strong> es genera sola a partir del teu perfil. Hi surten <strong>només les matèries que fas tu</strong>.</li>
+        <li><strong>Eines</strong> (plegable, clica-hi per obrir-la): Generador de grups, Generador de comentaris, Distribució de l'aula, Notes i post-its i Convocar reunions.</li>
+      </ul>
+      <p>Al peu hi ha el <strong>Manual d'ús</strong>, la <strong>Configuració</strong>, l'enllaç al <strong>Full de càlcul</strong> i l'indicador de sincronització.</p>
+      <p>Al <strong>mòbil</strong> el menú està amagat: toca el botó <strong>☰</strong> (a dalt a l'esquerra) per obrir-lo. Es tanca sol quan tries una opció.</p>
+      <div class="callout tip">
+        A baix a la dreta sempre hi tens en <strong>Vedrunu</strong>, l'assistent. Si et perds, pregunta-li a ell (apartat <a href="#vedrunu">21</a>).
+      </div>
+    </section>
+
+    <!-- 3. PERFIL -->
+    <section id="perfil">
+      <h2>3. El meu perfil</h2>
+      <p>Això és el <strong>primer que has d'omplir</strong>, perquè d'aquí surt tota la resta: quines assignatures et surten al menú, quins alumnes veus a cada graella i què pots avaluar.</p>
+      <div class="callout">
+        Posa-hi el <strong>nom i el cognom</strong>. Sense el cognom no es pot desar, i és a posta: hi ha mestres que es diuen igual, i el teu nom &eacute;s el que veuen les alt&shy;res quan comparteixes una nota o demanes una actualitzaci&oacute;.
+      </div>
+      <p>S'hi entra clicant el teu nom, a dalt de tot del menú lateral.</p>
+      <ul>
+        <li><strong>Nom i cognom.</strong> Serveix per saludar-te i per identificar-te.</li>
+        <li><strong>De quin grup ets tutor/a.</strong> Tries el curs i després la línia (per exemple, 2n → C). Serà el teu grup principal.</li>
+        <li><strong>Assignatures de la teva tutoria.</strong> Marca les que fas als teus tutoritzats.</li>
+        <li><strong>Altres cursos on fas classe.</strong> Afegeix el curs i marca-hi les assignatures. Per cada una tries el teu grup (o la classe sencera).</li>
+      </ul>
+      <p>Clica <strong>Desar perfil</strong> quan acabis. El menú d'Assignatures es refà tot sol.</p>
+      <div class="callout tip">
+        <strong>Desdoblaments:</strong> si una assignatura es fa desdoblada, tria quin grup et toca a tu i l'app ja et carregarà només aquells alumnes a les notes i al generador de grups. El <strong>Tallers</strong> és rotatori (el grup et va canviant); la resta són grup fix tot el curs.
+      </div>
+
+      <h3 id="perfil-especialista">Si ets especialista</h3>
+      <p>A l'app dels especialistes (mira sota el logo: hi ha de dir <strong>Especialistes</strong>) el perfil no et demana cap tutoria. Et demana <strong>a quins grups fas classe</strong>:</p>
+      <ul>
+        <li>Al desplegable <strong>+ Afegir grup…</strong> tria un grup: 3r A, 3r B, 5è C… un per un.</li>
+        <li>Dins de cada grup, marca les assignatures que hi fas.</li>
+        <li>Si fas la mateixa assignatura a tres línies, afegeix els <strong>tres grups</strong> i marca-la a cada un. Al menú et sortirà «Música 3r A», «Música 3r B» i «Música 3r C» per separat, cadascuna amb les seves notes i els seus alumnes.</li>
+        <li>La × de la capçalera treu el grup del perfil (t'avisa de què hi perds).</li>
+      </ul>
+      <p>La targeta de baix, <strong>Assignatures amb grup rotatori</strong>, és només per a les assignatures on els grups van rotant i no són una classe sencera, com el <strong>Tallers</strong>: allà s'hi afegeix el curs i es tria el grup que tens ara.</p>
+      <div class="callout tip">
+        <strong>Els desdoblaments els respecta a tot arreu.</strong> Si una de les teves assignatures és desdoblada, a les notes, als assoliments, al generador de grups, a «Veure alumnes», a les observacions i al registre d'aula hi surten <strong>els alumnes del teu grup</strong>, no la classe sencera. No has de fer res: ho agafa del full de desdoblaments.
+      </div>
+      <div class="callout">
+        <strong>Què no hi trobaràs</strong>, perquè són coses de tutor: la pàgina <strong>Alumnes</strong> i la <strong>Distribució de l'aula</strong>. Als alumnes hi arribes des de cada assignatura, amb el botó <strong>Veure alumnes</strong> (mira <a href="#alumnes">Alumnes</a>).
+      </div>
+
+      <h3 id="perfil-direccio">Si ets de direcció</h3>
+      <p>A l'app de direcció (sota el logo hi diu <strong>Direcció</strong>) el perfil tampoc no et demana cap tutoria: tu no en fas. Et demana només <strong>a quins grups fas classe</strong> i què hi fas, exactament igual que a una especialista (mira-ho <a href="#perfil-especialista">aquí sobre</a>). D'aquí en surt el teu menú d'assignatures, amb les seves notes, els assoliments i els comentaris.</p>
+      <div class="callout tip">
+        <strong>Ho tens tot.</strong> A diferència d'una especialista, a tu no se't treu res del menú: hi ha <strong>Alumnes</strong> i <strong>Distribució de l'aula</strong> igual que a un tutor. La diferència és que el grup no és fix: el tries tu a <a href="#alumnes">Alumnes</a>, i pots entrar a qualsevol dels 18 grups de primària.
+      </div>
+    </section>
+
+    <!-- 4. HORARI -->
+    <section id="horari">
+      <h2>4. Horari</h2>
+      <p>És la teva <strong>plantilla setmanal</strong>: què fas cada dia a cada franja. S'omple un cop a principi de curs i estalvia moltíssima feina, perquè d'aquí surt el planning de tot l'any.</p>
+      <ul>
+        <li><strong>Clica una casella</strong> per assignar-hi una matèria. Pots escriure-la o triar-ne una de les que ja surten. Les matèries noves que hi posis es creen soles a l'app.</li>
+        <li><strong>Importar ràpid:</strong> si tens l'horari en un full de càlcul o en una taula, copia'l i enganxa'l aquí. T'estalvies anar casella per casella.</li>
+        <li><strong>Aplicar al planning:</strong> agafa la plantilla i omple amb ella <strong>tot el curs</strong> del planning setmanal, d'un sol cop. Abans de fer-ho <strong>et diu de quin curs parla</strong> («Aplicar l'horari a totes les setmanes del curs 2026-27?»): mira-t'ho, sobretot si ho fas a l'agost. I <strong>no omple els dies de vacances ni els festius</strong> —Nadal, Setmana Santa, els dies de lliure disposició—: els salta i t'ho diu al final.</li>
+      </ul>
+      <p>A les franges de pati hi pots marcar, a més, els <strong>encàrrecs</strong> que et toquen.</p>
+
+      <h3 id="horari-pdf">Omplir-lo amb el PDF de l'escola</h3>
+      <p>És la manera més ràpida i la que hauries de fer servir a principi de curs: <strong>Horari &rarr; «Omplir-lo amb el PDF»</strong>, adjunta el PDF dels horaris que passa la direcció, i la graella s'omple sola.</p>
+      <ul>
+        <li>Pots adjuntar-hi <strong>el de tota l'escola</strong>: l'app busca la teva pàgina pel nom del perfil. Si no l'encerta, la tries d'una llista.</li>
+        <li>Abans d'omplir res <strong>veus com quedarà</strong>, la setmana sencera. Mira-t'ho: si has triat la pàgina d'una altra mestra, aquí és on es veu.</li>
+        <li>El que ja tinguis escrit i el PDF canviï, surt <strong>en groc</strong>. El que tinguis en una casella que el PDF deixa buida, <strong>es queda</strong>.</li>
+      </ul>
+      <div class="callout tip">
+        El PDF <strong>no surt del teu ordinador</strong>: es llegeix aquí mateix. Per això va instantani i funciona encara que no tinguis connexió.
+      </div>
+      <div class="callout">
+        L'esbarjo i el dinar no s'importen. La banda del <strong>PACBAL</strong> ocupa la franja de les 9:45, i quan hi és, hi mana: la casella dirà «PACBAL».
+      </div>
+      <div class="callout warn">
+        <strong>Ordre recomanat:</strong> primer el <a href="#perfil">perfil</a>, després l'horari i llavors «Aplicar al planning». Si ho fas al revés, l'horari encara no sabrà quines assignatures tens.
+      </div>
+      <div class="callout">
+        Aplicar l'horari <strong>no trepitja</strong> el que ja tinguis marcat com a festiu o com a activitat especial: el calendari escolar es respecta.
+      </div>
+    </section>
+
+    <!-- 5. INICI -->
+    <section id="inici">
+      <h2>5. Inici</h2>
+      <p>La pantalla d'inici és el teu tauler de control. Conté:</p>
+      <ul>
+        <li><strong>Accés ràpid:</strong> botons per anar directament als apartats més usats. El de <strong>Tasques</strong> mostra una <span class="feature-icon">bombolla vermella</span> amb el nombre de pendents (sumant les pròpies i les de Google Tasks).</li>
+        <li><strong>Avui:</strong> l'horari del dia, les tasques que vencen avui i els events del calendari d'avui.</li>
+        <li><strong>Per tenir en compte:</strong> recordatoris de tasques i events propers, fins a 7 dies vista.</li>
+        <li><strong>Com pinta la setmana:</strong> una vista ràpida dels cinc dies amb els events de cadascun.</li>
+        <li><strong>Enllaços d'interès:</strong> Gmail i Drive hi són sempre. Els de <strong>Coordinació</strong> i <strong>ClassDojo</strong> els poses tu (Configuració → «Els meus enllaços»); si els deixes buits, la icona no surt.</li>
+      </ul>
+      <div class="callout">
+        L'enllaç de ClassDojo apunta sempre a una classe concreta, així que <strong>cadascú hi ha de posar el seu</strong>. Si no, obriries la classe d'una altra mestra.
+      </div>
+    
+      <h3 id="inici-millores">Possibles actualitzacions</h3>
+      <p>A l'inici hi ha un botó <strong>«Possibles actualitzacions»</strong>. A dins hi ha coses que <strong>ja funcionen a l'app d'alguna companya</strong>, explicades ras i curt.</p>
+      <ul>
+        <li><strong>Vull saber-ne més:</strong> obre l'explicació sencera, per si no queda clar què fa.</li>
+        <li><strong>Jo la vull!:</strong> li arriba un correu a en Pol amb el teu nom i què demanes. Pots afegir-hi el que vulguis (per exemple, si et corre pressa).</li>
+        <li>Les que encara no has obert surten marcades com a <strong>«Nova»</strong>, i al botó de l'inici hi surt <strong>quantes n'hi ha de noves</strong>. Un cop les has llegides, el número desapareix.</li>
+      </ul>
+      <div class="callout tip">
+        Demanar-la <strong>no canvia res</strong> a la teva app. En Pol t'ho prepara i ja t'ho dirà. Un cop demanada, el botó es queda dient «Demanada ✓» perquè no la demanis dues vegades sense voler. Aix&ograve; <strong>et segueix a qualsevol aparell</strong>: si la demanes des de l&#39;ordinador, al m&ograve;bil ja hi surt com a demanada.
+      </div>
+      <div class="callout">
+        <strong>I si tens una idea que no hi és?</strong> Digue-la-hi directament a en Pol. Si creu que pot servir a més gent, l'explicarà aquí i llavors la podrà demanar tothom. D'aquí surt tota la llista.
+      </div>
+
+</section>
+
+    <!-- 6. PLANNING -->
+    <section id="planning">
+      <h2>6. Planning setmanal</h2>
+      <p>És la graella de programació de la setmana, amb els cinc dies (dilluns a divendres) i les vuit franges horàries:</p>
+      <table>
+        <tr><th>Franja</th><th>Horari</th></tr>
+        <tr><td>1a</td><td>08:50 – 09:45</td></tr>
+        <tr><td>2a</td><td>09:45 – 10:40</td></tr>
+        <tr><td>Pati</td><td>10:40 – 11:10</td></tr>
+        <tr><td>3a</td><td>11:10 – 12:00</td></tr>
+        <tr><td>4a</td><td>12:00 – 12:50</td></tr>
+        <tr><td>Migdia</td><td>12:50 – 14:50</td></tr>
+        <tr><td>5a</td><td>14:50 – 15:50</td></tr>
+        <tr><td>6a</td><td>15:50 – 16:50</td></tr>
+      </table>
+
+      <h3>Programar una franja</h3>
+      <p>Clica qualsevol cel·la per obrir l'editor. Pots triar entre quatre tipus:</p>
+      <ul>
+        <li><strong>Normal:</strong> una sessió de classe. Pots posar-hi l'assignatura i una alerta o recordatori.</li>
+        <li><strong>Festa / No lectiu:</strong> per a dies festius.</li>
+        <li><strong>Activitat especial:</strong> sortides internes, jornades, etc.</li>
+        <li><strong>Sortida / Colònies:</strong> per a excursions i sortides.</li>
+      </ul>
+
+      <h4>Durada de les activitats especials</h4>
+      <p>Quan tries festa, especial o sortida, apareix un selector de durada:</p>
+      <ul>
+        <li><strong>Només aquesta franja:</strong> ocupa una sola hora.</li>
+        <li><strong>Tot el dia:</strong> omple automàticament totes les franges restants del dia.</li>
+        <li><strong>Franges personalitzades:</strong> amb els botons − i + tries quantes franges ocupa (útil per a sortides de mig dia).</li>
+      </ul>
+      <div class="callout">
+        Si esborres una activitat especial que ocupa diverses franges, l'app detecta i esborra totes les franges d'aquell event de cop.
+      </div>
+
+      <h3>Comentaris de sessió, notes i events</h3>
+      <ul>
+        <li><strong>Comentari de sessió:</strong> cada franja té una petita bafarada per apuntar com ha anat la sessió. Es posa granat si té contingut.</li>
+        <li><strong>Notes de la setmana i del dia:</strong> pots afegir notes generals de la setmana i notes específiques de cada dia (amb la × per esborrar-les una a una).</li>
+        <li><strong>Events del calendari:</strong> els events del Calendari i del teu Google Calendar surten sols a la franja horària que els correspon, com un bloc blau. Clica'l per anar al calendari.</li>
+      </ul>
+      <p>Amb les fletxes de dalt navegues entre setmanes o tornes a la setmana actual.</p>
+    </section>
+
+    <!-- 7. CALENDARI -->
+    <section id="calendari">
+      <h2>7. Calendari mensual</h2>
+      <p>Vista mes a mes amb tots els events. Combina els que crees dins l'app i els del teu Google Calendar.</p>
+      <h3>Crear i gestionar events</h3>
+      <ul>
+        <li>Clica <strong>+ Nou event</strong> per afegir-ne un: títol, data, hora (opcional), categoria, descripció i enllaç.</li>
+        <li>Clica un event existent per editar-lo o eliminar-lo.</li>
+        <li><strong>Si dura més d'un dia</strong> (colònies, una sortida de dos dies, la setmana cultural), omple <strong>«Fins al dia»</strong>: l'event surt tots els dies del tram, al calendari i al planning, i al Google hi va com un event de tot el dia. També a la <strong>portada</strong>, i mentre s'està fent hi diu «avui».</li>
+      </ul>
+      <div class="callout tip">
+        Si el «Fins al dia» dona un event de <strong>més d'un mes</strong>, l'app t'ho pregunta abans de desar-lo: sol ser un any mal teclejat. I si l'any no és d'aquest món, no el deixa desar —l'event aniria a parar a un racó del calendari on no el trobaries.
+      </div>
+      <div class="callout tip">
+        <strong>Connexió amb el planning:</strong> qualsevol event amb hora concreta apareix automàticament a la franja corresponent del planning setmanal i a la pàgina d'inici. Només l'has d'introduir un cop.
+      </div>
+      <p>Navega entre mesos amb les fletxes. Els events de Google Calendar es carreguen sols del mes actual i del següent, fins i tot sense obrir el calendari.</p>
+
+      <h3 id="categories">Categories i llegenda</h3>
+      <p>Cada event té una <strong>categoria</strong>, que li dona el color amb què el veus al calendari. La llegenda de sota la graella les mostra totes.</p>
+      <p>Amb el botó <strong>⚙ Categories</strong> (a la dreta) les gestiones:</p>
+      <ul>
+        <li><strong>Canviar-ne el nom</strong> i <strong>el color</strong> de les que ja hi ha.</li>
+        <li><strong>Afegir-ne de noves</strong>: posa-hi un nom i tria un color.</li>
+        <li><strong>Eliminar-ne.</strong> Si la categoria té events, l'app t'avisa de quants en són abans de deixar-t'ho fer. Els events no s'esborren: es queden sense categoria.</li>
+      </ul>
+      <div class="callout">
+        <strong>La categoria «Festiu» és especial.</strong> És la que fa servir el calendari escolar quan es sembra a principi de curs. La pots reanomenar i canviar-ne el color tant com vulguis (per exemple, dir-li «No lectiu» i posar-la grisa) i els festius la continuaran fent servir: no es perd la relació.
+      </div>
+
+      <h3 id="agendar">Per agendar</h3>
+      <p>Sota la graella hi ha la llista <strong>PER AGENDAR</strong>: coses que saps que has de fer però encara no saps quin dia. Clica <strong>+ Afegir</strong>, escriu-ho i queda allà a la vista fins que decideixis la data.</p>
+      <p>És la manera de treure't del cap allò de «hem de quedar per parlar de…» sense haver-ho de posar en un dia concret encara.</p>
+    </section>
+
+    <!-- 8. TASQUES -->
+    <section id="tasques">
+      <h2>8. Tasques</h2>
+      <p>Gestor de tasques pendents amb dues fonts:</p>
+      <ul>
+        <li><strong>Tasques pròpies:</strong> les que crees dins l'app. Poden tenir text, data de venciment i es marquen com a fetes.</li>
+        <li><strong>Google Tasks:</strong> l'app carrega les teves tasques de Google Tasks i les mostra integrades, agrupades per llista.</li>
+      </ul>
+      <div class="callout">
+        Les de Google també les pots <strong>marcar com a fetes des d'aquí</strong>: clica la caseta i es marquen al teu Google Tasks. Com que allà passen a fetes, desapareixen de la llista. Si t'equivoques, desfés-ho des del Google Tasks.
+      </div>
+      <p>El botó <strong>Netejar fetes</strong> elimina les ja completades. El nombre total de pendents surt a la bombolla vermella de la pàgina d'inici.</p>
+    </section>
+
+    <!-- 9. GOOGLE -->
+    <section id="google">
+      <h2>9. Enviar-ho al meu Google</h2>
+      <p>Per defecte l'app <strong>llegeix</strong> el teu Google Calendar i el teu Google Tasks, però no hi escriu. Si vols, pot fer-ho també al revés: que tot el que crees a l'app aparegui al teu Google.</p>
+      <p>S'activa a <strong>Configuració → Escriure al meu Google</strong>, amb la casella <em>«Enviar els meus events i tasques al Google Calendar i al Google Tasks»</em>.</p>
+      <div class="callout tip">
+        <strong>No cal que recordis si ho tens activat.</strong> A la p&agrave;gina del <strong>Calendari</strong>, just sota les fletxes dels mesos, hi ha una l&iacute;nia que t&#39;ho diu: &laquo;El que facis aqu&iacute; va al teu Google Calendar &#10003;&raquo;, o b&eacute; que <strong>no</strong> s&#39;hi envia, amb un bot&oacute; per activar-ho all&agrave; mateix. Si hi surt que hi ha events pendents, clica <strong>Provar ara</strong>.
+      </div>
+      <p>Un cop activat:</p>
+      <ul>
+        <li>Els <strong>events</strong> que creïs al calendari de l'app apareixen al teu Google Calendar.</li>
+        <li>Les <strong>tasques</strong> que creïs a l'app apareixen al teu Google Tasks.</li>
+        <li>Si els <strong>canvies o els esborres</strong> a l'app, allà també canvien o s'esborren.</li>
+        <li>Ho veuràs, doncs, al mòbil, al rellotge, o allà on tinguis el Google.</li>
+      </ul>
+      <div class="callout">
+        <strong>Els festius del calendari escolar NO s'hi envien.</strong> Seria omplir-te el Google Calendar de dies vermells que ja saps. Només va el que has creat tu.
+      </div>
+      <div class="callout warn">
+        <strong>Va en un sol sentit:</strong> de l'app cap al Google. Si canvies un event <em>des del</em> Google Calendar, aquell canvi no torna cap a l'app. Fes els canvis des de l'app.
+      </div>
+      <p>Al costat de la casella hi ha l'<strong>Estat</strong>, que et diu si està activat i si hi ha res pendent d'enviar. Si en algun moment no hi ha connexió, l'app s'ho guarda i ho torna a intentar sola més tard.</p>
+    </section>
+
+    <!-- 10. ALUMNES -->
+    <section id="alumnes">
+      <h2>10. Alumnes</h2>
+      <p>La llista de tots els alumnes de la classe, en format de targetes. Des d'aquí gestiones tota la informació de cadascun.</p>
+      <div class="callout tip">
+        <strong>Buscar un alumne:</strong> amb més de vuit alumnes hi surt una caixa de cerca sota el compte del grup. Escriu-hi una part del nom i la llista es queda amb qui hi encaixi. <strong>No cal posar els accents</strong>: «julia» troba la Júlia.
+      </div>
+      <div class="callout">
+        <strong>Dos nens que es diuen igual:</strong> si al grup n'hi ha dos amb el nom i els cognoms exactament iguals, l'app els numera a totes les llistes i desplegables —«Júlia Serra (1)» i «Júlia Serra (2)»— i el número és sempre el mateix per a cadascuna. Sense això no hi hauria manera de saber a quina estàs escrivint.
+      </div>
+      <p>Sota els botons dels documents hi tens el <strong>compte del grup</strong>: quants alumnes hi ha i quants s&oacute;n nens i quantes nenes. Si n&#39;hi ha algun sense g&egrave;nere posat, tamb&eacute; t&#39;ho diu &mdash; aix&iacute; els n&uacute;meros sempre sumen el total.</p>
+      <div class="callout tip">
+        A la fitxa d&#39;un alumne, el <strong>g&egrave;nere</strong> i les <strong>condicions del lloc a l&#39;aula</strong> es <strong>guarden sols</strong> quan els canvies: no hi ha cap bot&oacute; de Guardar. Es desa <strong>en segon pla</strong>, sense aturar-te: tries, tanques i ja est&agrave;. Al peu de la finestra hi diu <strong>&laquo;Desat &check;&raquo;</strong> quan ja hi &eacute;s, i si algun cop no s&#39;ha pogut desar i ja l&#39;has tancada, t&#39;ho dir&agrave; amb un av&iacute;s.
+      </div>
+      <div class="callout">
+        <strong>Si ets especialista</strong> aquesta pàgina no et surt al menú, perquè no tens un grup propi: tens els alumnes de molts grups. Hi arribes des de cada assignatura. Obre l'assignatura al menú de l'esquerra i clica <strong>Veure alumnes</strong>: et sortiran els d'aquell grup, i clicant <strong>Fitxa</strong> en veus tota la informació. La fitxa és <strong>de consulta</strong>: les dades de la família, el PI, l'AM o l'informe EAP els manté qui n'és tutor/a. El que sí que hi pots fer és <strong>afegir una observació</strong>, amb el botó de sota de la fitxa.
+      </div>
+
+      <h3 id="alumnes-direccio">Si ets de direcció: triar el grup</h3>
+      <p>A l'app de direcció aquesta pàgina sí que hi és, i hi tens <strong>tots els grups de primària</strong>. A dalt de la llista hi ha el selector: clica el <strong>curs</strong> (1r … 6è) i després la <strong>línia</strong> (A, B o C). Al costat t'hi diu quants alumnes hi ha.</p>
+      <p>A partir d'aquí, aquell grup és el teu grup de treball: hi pots fer <strong>tot el que hi faria el seu tutor</strong> — afegir-hi observacions, muntar la distribució de l'aula, passar-hi registres. Les dades de l'alumne (fam&iacute;lia, PI, AM, informe EAP&hellip;) surten dels documents de l'escola i des de l'app <strong>només es miren</strong>.</p>
+      <p>El grup triat es recorda: la propera vegada que obris l'app, hi tornes a ser. I et segueix per <a href="#observacions">Observacions</a>, <a href="#registres">Registres d'aula</a> i <a href="#seients">Distribució de l'aula</a>, que sempre parlen del grup que tens triat.</p>
+      <div class="callout tip">
+        <strong>Per a què serveix:</strong> veure de seguida com est&agrave; qualsevol grup i qu&egrave; hi va escrivint la resta de mestres, sense haver d'obrir cap document.
+      </div>
+      <div class="callout warn">
+        <strong>Mira sempre quin grup tens triat</strong> abans d'escriure res. El que desis va al grup del selector, i canviar de grup buida la pantalla i hi porta els alumnes del nou.
+      </div>
+
+      <h3>Afegir un alumne</h3>
+      <p>Obre el panell de gestió i clica <strong>Afegir</strong>. Has d'indicar el nom i el <strong>gènere</strong>, que serveix perquè el generador de comentaris faci servir l'article correcte («en Bruno», «la Laura», «l'Aitana»).</p>
+
+      <h3 id="contactes">Els contactes de la família</h3>
+      <p>El <strong>tutor/a 1</strong>, el <strong>tutor/a 2</strong>, els seus correus i els <strong>telèfons</strong> surten del full <strong>Dades de contacte alumnes</strong> de secretaria, i s'actualitzen sols: l'app se'l mira cada quart d'hora i, si hi ha canviat res, ho passa a les fitxes.</p>
+      <p>Ja no hi diu «mare» i «pare»: l'escola parla de <strong>tutors</strong>, que no sempre és això.</p>
+      <p>Els <strong>telèfons</strong> van tots junts, l'un al costat de l'altre, sense dir de qui és cadascun. Al full de secretaria hi van repartits en set columnes que ni tan sols ho diuen sempre, i cada nen en té una quantitat diferent. Si algun porta apuntat de qui és («Àvia», «feina mare», «ext. 2»), es manté.</p>
+      <div class="callout warn">
+        <strong>Aix&ograve; no s&#39;edita des de l&#39;app.</strong> Si un tel&egrave;fon o un correu no &eacute;s b&eacute;, s&#39;ha d&#39;arreglar al full de <strong>secretaria</strong>: si ho canviessis aqu&iacute;, a la propera passada hi tornaria a sortir el d&#39;abans.
+      </div>
+      <div class="callout">
+        Si un alumne surt <strong>sense contactes</strong>, &eacute;s que encara no t&eacute; fila al full de secretaria &mdash; passa amb les incorporacions noves.
+      </div>
+
+      <h3 id="dubtes">Coses del document «Aspectes generals» que l'app no ha sabut col·locar</h3>
+      <p><a href="https://docs.google.com/spreadsheets/d/1muxIeGoux6wG4gMZ7Xus58ULG-99Wsb0H3yONzCHKUo/edit" target="_blank" rel="noopener">Aspectes generals grup</a> l'escriviu divuit mestres, cadascuna a la seva manera, i de vegades l'app no acaba d'entendre una casella: un nom que pot ser de dos nens del grup, un nom mal escrit, un nen que ja ha marxat, o un apartat nou que no sap on posar.</p>
+      <p>Quan passa això, <strong>no ho posa a la fitxa de ningú</strong> i t'ho deixa apuntat a <strong>Alumnes</strong>: sota els botons dels documents hi surt un avís que diu quantes coses hi ha. Clica <strong>Mirar-ho</strong> i les veuràs una per una.</p>
+      <ul>
+        <li>Si és un <strong>nom que hi és però escrit d'una altra manera</strong>, tria l'alumne al desplegable i clica <strong>És aquest</strong>. Hi surten tots els nens del grup, i a dalt de tot els que s'hi assemblen. Al cap d'uns segons la informació ja és a la seva fitxa. <strong>Només s'ha de dir una vegada</strong>: a partir d'aquí l'app ja sap qui és, també les properes vegades que el document en parli.</li>
+        <li>Si és un <strong>nen que ja no és en aquesta classe</strong>, <strong>no triïs ningú</strong>. Si ha canviat de grup dins de l'escola, l'app t'ho diu (<em>«La Zoraida ara és a 2n A»</em>): el que toca és <strong>passar-lo al seu grup al document</strong>. I si ha marxat de l'escola, treure'l. Mentre hi sigui, tornarà a sortir cada vegada.</li>
+        <li>Si és un <strong>apartat que no sap on va</strong>, això tampoc no ho arregles des d'aquí: t'ensenya el que hi diu el document perquè ho sàpigues, i amb <strong>Ja ho he mirat</strong> el treus de la llista. Si és informació que hauria de ser a les fitxes, escriu-la al document dins d'un apartat que l'app ja conegui (Família, Intoleràncies, Pares separats…) o digues-ho en Pol.</li>
+        <li>Si és un <strong>tros que no vol dir res</strong> —un «grup B», un «i vigilar»—, és que aquella línia del document parla de mitja classe alhora i no s'ha pogut repartir. T'ensenya <strong>la casella sencera</strong>, que és on hi ha el que importa. Es resol escrivint-la al document <strong>una línia per nen</strong>: «Nom: què li passa», com ja es fa a <em>Altres observacions</em>.</li>
+      </ul>
+      <div class="callout warn">
+        <strong>El remei sempre és el document, no l&#39;app.</strong> Qualsevol cosa que vulguis canviar d&#39;un alumne &mdash; afegir-lo, treure&#39;l, canviar-li el PI, les al&middot;l&egrave;rgies o la fam&iacute;lia &mdash; es fa a <a href="https://docs.google.com/spreadsheets/d/1muxIeGoux6wG4gMZ7Xus58ULG-99Wsb0H3yONzCHKUo/edit" target="_blank" rel="noopener">Aspectes generals grup</a>. L&#39;app se&#39;n va assabentant sola. Si ho arregles nom&eacute;s aqu&iacute;, demà tornarà a sortir igual.
+      </div>
+      <div class="callout tip">
+        <strong>Per qu&egrave; va aix&iacute;:</strong> val m&eacute;s que una dada <strong>hi falti</strong> i t&#39;ho digui, que no pas que surti al <strong>nen equivocat</strong>. Una dada al lloc que no toca no la va a comprovar ning&uacute;. Per aix&ograve; l&#39;app <strong>mai no escriu un tros de frase</strong> a la fitxa d&#39;un nen: o s&#39;ent&eacute;n del tot, o va a parar aqu&iacute;.
+      </div>
+      <div class="callout">
+        Aquesta llista &eacute;s la del <strong>teu grup</strong>, i la valides tu: ets qui coneix aquells nens. A les especialistes no els surt.
+      </div>
+
+      <h3 id="dades">Dades personals i atenció a la diversitat</h3>
+      <div class="callout warn">
+        <strong>Aquestes dades no s&#39;editen des de l&#39;app.</strong> Surten dels <strong>documents oficials de l&#39;escola</strong> i s&#39;hi actualitzen soles. A la fitxa <strong>només es miren</strong>.
+        <br><br>Per canviar-ne cap, ves al document que toqui — els tens als botons de dalt de tot d&#39;<strong>Alumnes</strong>: <a href="https://docs.google.com/spreadsheets/d/1muxIeGoux6wG4gMZ7Xus58ULG-99Wsb0H3yONzCHKUo/edit" target="_blank" rel="noopener">Aspectes generals grup</a>, <em>Desdoblaments grups</em> i <em>Llistat d&#39;alumnes per grup</em>. Els contactes de la fam&iacute;lia surten del full <em>Dades de contacte alumnes</em> de secretaria. Aix&iacute; el que escrius val per a tothom i no se&#39;t desf&agrave; el dia que arribi el document.
+      </div>
+      <p>Clica la icona de persona d'una targeta per obrir el calaix de dades. Hi veur&agrave;s:</p>
+      <ul>
+        <li><strong>Família:</strong> el <strong>tutor/a 1</strong> i el <strong>tutor/a 2</strong> amb els seus correus, i tots els <strong>telèfons</strong> de la família de costat.</li>
+        <li><strong>Observacions mèdiques:</strong> al·lèrgies, intoleràncies, etc. Es marquen amb una <span class="badge badge-med">+</span>.</li>
+        <li><strong>PI (Pla Individualitzat):</strong> quines assignatures hi té, segons el document de l'escola. <strong>Aquí només es mira</strong>: si hi has de canviar res, es fa al document.</li>
+        <li><strong>AM (Adaptació Metodològica):</strong> igual.</li>
+        <li><strong>Informe de l'EAP:</strong> marca la casella i hi pots escriure el dictamen o les recomanacions. Es mostra a la fitxa amb una etiqueta morada.</li>
+        <li><strong>Aspectes conductuals o necessitats concretes:</strong> camp lliure per apuntar coses com «Dislèxia i lateralitat creuada» o «No té drets d'imatge».</li>
+      </ul>
+      <div class="callout">
+        Si no hi ha ni PI ni AM, l'alumne és <strong>normatiu</strong>.
+      </div>
+      <div class="callout">
+        Les assignatures del PI i de l'AM <strong>no es poden clicar</strong>: hi són per mirar-les.
+        Abans sí que es podien, i un clic sense voler en treia una del document que veu tot el
+        claustre sense dir res. Si n'hi falta o n'hi sobra cap, canvia-ho al document de fitxes.
+      </div>
+      <p>Dues coses <strong>sí</strong> que les tries tu al calaix, perqu&egrave; no s&oacute;n de cap document:</p>
+      <ul>
+        <li><strong>El g&egrave;nere</strong> de l&#39;alumne, a dalt de tot. Es fa servir per parlar-ne b&eacute; i a la distribuci&oacute; de l&#39;aula.</li>
+        <li><strong>Les condicions per als llocs de l&#39;aula</strong>: a prop del mestre, lluny de la porta, amb qui no pot seure&hellip;</li>
+      </ul>
+      <div class="callout warn">
+        <strong>Treure un alumne</strong> és a baix de tot del calaix. Només si ja no és a la classe: perdràs les seves observacions i entrevistes, i <strong>no es pot desfer</strong>.
+      </div>
+      <div class="callout warn">
+        <strong>Aquests camps s&#39;omplen sols des del document de l&#39;escola.</strong> El PI, l&#39;AM, l&#39;informe de l&#39;EAP, els <strong>trastorns</strong>, l&#39;<strong>aula d&#39;acollida</strong>, els <strong>drets d&#39;imatge</strong>, l&#39;<strong>EMVic</strong>, els aspectes conductuals i la informaci&oacute; m&egrave;dica surten del document de <strong>fitxes de grup</strong> que ompliu entre totes. Cadascun t&eacute; la seva etiqueta a la fitxa, per no confondre un diagn&ograve;stic amb una nota de conducta. Vol dir dues coses:
+        <ul>
+          <li>No els has d&#39;escriure tu: hi arriben sols.</li>
+          <li>Si els canvies aqu&iacute; i al document diu una altra cosa, <strong>tornar&agrave; a manar el document</strong>. Per canviar-ho de debò, canvia-ho all&agrave;.</li>
+        </ul>
+        On el document <strong>no diu res</strong>, el que hi escriguis tu es queda.
+      </div>
+
+      <h3 id="seient-cond">Condicions de seient</h3>
+      <p>Dins del mateix calaix de dades hi ha la secció <strong>«Condicions per als llocs de l'aula»</strong>. Aquí defineixes on ha de seure cada alumne perquè l'eina de <a href="#seients">Distribució de l'aula</a> ho tingui en compte automàticament:</p>
+      <ul>
+        <li><strong>A prop de la taula del mestre.</strong></li>
+        <li><strong>Lluny de la porta.</strong></li>
+        <li><strong>Lluny de les finestres.</strong></li>
+        <li><strong>Sempre al mateix lloc:</strong> fixa l'alumne a la posició que li assignis al plànol; els repartiments no el mouran.</li>
+        <li><strong>No pot seure al costat de:</strong> tria un o més companys amb qui no ha de fer de veí. És bidireccional: si marques que l'Anna no va amb en Bruno, en Bruno tampoc anirà amb l'Anna.</li>
+      </ul>
+
+      <h4>Indicadors a la targeta</h4>
+      <p>A la cantonada superior dreta de cada targeta apareixen, si escau:</p>
+      <ul>
+        <li><span class="badge badge-pi">PI</span> (blau) si té Pla Individualitzat.</li>
+        <li><span class="badge badge-am">AM</span> (taronja) si té Adaptació Metodològica.</li>
+        <li>El símbol <strong>⚠</strong> si té observacions mèdiques o aspectes específics.</li>
+      </ul>
+
+      <h3 id="fitxa">Fitxa de l'alumne</h3>
+      <p>Clica el nom o l'avatar d'una targeta per obrir la fitxa completa, que reuneix:</p>
+      <ul>
+        <li>Els avisos destacats (mèdic amb <strong>+</strong>, específics amb ⚠, els badges PI/AM amb les assignatures i l'informe EAP).</li>
+        <li>Les dades de contacte de la família.</li>
+        <li>Les observacions per trimestre.</li>
+        <li>Les notes finals de totes les assignatures i el nombre d'activitats no entregades.</li>
+        <li>El percentatge d'assoliments per assignatura i trimestre.</li>
+      </ul>
+      <div class="callout">
+        <strong>Privilegi del tutor/a:</strong> sota les teves notes hi surt <strong>Altres assignatures</strong>, amb les que li fan les altres mestres. Cada mestra decideix si les comparteix; si no ho ha fet, hi surt «Notes no compartides». Hi veus la nota de cada trimestre i qui la fa, no el detall.
+      </div>
+      <p>Amb les fletxes de navegació passes d'un alumne al següent sense tornar a la llista.</p>
+
+      <h3 id="entrevistes">Entrevistes amb la família</h3>
+      <p>A baix de la fitxa hi tens <strong>Entrevistes amb la família</strong>. Serveix per marcar que has quedat amb els pares, quin dia i a quina hora, i apuntar-hi com ha anat.</p>
+      <ol class="step-list">
+        <li>Clica <strong>+ Apuntar una entrevista</strong>.</li>
+        <li>Posa-hi el <strong>dia</strong> (l'hora és opcional) i, si vols, <strong>com ha anat</strong>.</li>
+        <li>Desa.</li>
+      </ol>
+      <ul>
+        <li>Un alumne en pot tenir <strong>tantes com calgui</strong>: la primera de tot el curs i les de seguiment que vagis fent. Surten de la més nova a la més vella.</li>
+        <li>Les pots <strong>editar</strong> o <strong>esborrar</strong> (en esborrar-ne una, t'avisa que també se n'anirà el que hi has escrit).</li>
+      </ul>
+      <div class="callout warn">
+        <strong>El que escrius NOMÉS ho veus tu.</strong> Al full compartit hi van únicament <strong>quantes entrevistes has fet de cada alumne i les dates</strong>, perquè direcció pugui portar el control de qui n'ha fet i qui no (de tant en tant els en demanen dades). <strong>El que has apuntat de com ha anat no surt mai del teu full</strong>, ni ho veu ningú més.
+      </div>
+      <div class="callout warn">
+        <strong>Si algun dia et surt que «no s&#39;ha desat res»</strong>, fes-ne cas i <strong>no ho tornis a provar</strong>: avisa en Pol. L&#39;app s&#39;atura a posta quan veu que hi ha alguna cosa rara amb el que ja tens desat, perqu&egrave; val m&eacute;s no desar que esborrar-t&#39;ho tot sense adonar-se&#39;n. El mateix val per als <strong>esmorzars</strong> i els <strong>registres del claustre</strong>.
+      </div>
+      <div class="callout tip">
+        <strong>On es veu:</strong> només aquí dins, a la fitxa de cada alumne. Ni la llista d'alumnes ni cap altra pantalla no en diuen res.
+      </div>
+      <p>Això no substitueix el registre oficial que ja feu en una altra aplicació: és per tenir-ho a mà i que no se't passi cap família.</p>
+      <div class="callout">
+        Els <strong>especialistes</strong> també poden obrir la fitxa: hi veuen tota la informació de l'alumne, però les notes i assoliments només de les assignatures que ells fan en aquell grup.
+      </div>
+      <div class="callout warn">
+        <strong>Això ho veuen les altres mestres.</strong> Les dades de la fitxa i les condicions de seient es desen al full de grups compartit. Qualsevol mestra que faci classe en aquell grup i el tingui seleccionat les veurà. És a posta —serveix perquè tothom sàpiga que un nen és celíac o que li costa la lletra—, però tingues-ho present quan hi escriguis. Veure també <a href="#observacions">Observacions</a>.
+      </div>
+    </section>
+
+    <!-- 11. DOCENTS (només direcció) -->
+    <section id="docents">
+      <h2>11. Docents</h2>
+      <div class="callout">
+        <strong>Aquest apartat només és a l'app de direcció.</strong> Si sota el logo no hi diu <strong>Direcció</strong>, no el veuràs al menú, i és a posta.
+      </div>
+      <p>És la <strong>portada de tot el que té a veure amb els mestres</strong> de l'escola. Hi trobaràs botons, i cada un obre una eina. Amb el botó <strong>‹ Docents</strong> de dalt tornes a la portada (i el gest d'enrere del mòbil també).</p>
+
+      <h3 id="docents-llistat">Llistat de docents</h3>
+      <p>El <strong>claustre de primària</strong> en una pantalla: qui és tutor de cada grup, qui són les especialistes de cada cicle, qui coordina cada cicle, qui és de l'equip directiu i qui és de l'equip SIEI.</p>
+      <p>Hi surt ordenat per cicles, com al document de l'escola: <strong>primer cicle</strong> (1r i 2n), <strong>segon cicle</strong> (3r i 4t) i <strong>tercer cicle</strong> (5è i 6è), i l'<strong>equip SIEI</strong> a part. Dins de cada cicle, primer les tutories i després les especialistes.</p>
+
+      <h3 id="docents-cercar">Trobar algú de pressa</h3>
+      <ul>
+        <li>El <strong>cercador</strong> de dalt busca pel nom, i també <strong>pel grup</strong>: si escrius «4t B» et surt qui n'és tutor.</li>
+        <li>Els <strong>botons</strong> del costat deixen només les tutories, només les especialistes o només l'equip SIEI.</li>
+      </ul>
+
+      <h3 id="docents-alumnes">Del docent als seus alumnes</h3>
+      <p>A cada tutoria hi ha el botó <strong>Veure els alumnes</strong>: obre aquell grup a <a href="#alumnes-direccio">Alumnes</a> directament. És el camí curt per anar a completar les dades d'un grup el tutor del qual encara no fa servir l'app.</p>
+
+      <div class="callout tip">
+        <strong>Els distintius:</strong> «Coordinació de cicle», «Equip directiu» i «Equip SIEI» surten al costat del nom de qui li toca. Una mateixa persona pot tenir-ne més d'un.
+      </div>
+      <div class="callout warn">
+        <strong>La llista es manté des del codi</strong>, no des de l'app: és la mateixa per a tota l'escola i canvia un cop l'any. Quan a principi de curs es reparteixin les tutories, digues-ho a en Pol i l'actualitza per a tothom d'una sola vegada.
+      </div>
+
+      <h3 id="docents-coordinacio">Coordinació: els esmorzars</h3>
+      <p>Cada setmana un membre de l'equip de coordinació porta l'esmorzar a la reunió. Aquí s'apunta com va anar, i l'eina porta el compte.</p>
+      <p>A l'esquerra, el formulari: tria <strong>qui havia de portar l'esmorzar</strong> (hi surten els tres coordinadors de cicle i els dos de l'equip directiu), el <strong>dia</strong>, i digues si <strong>l'ha portat</strong>. Si sí, posa-li una <strong>nota de l'1 al 10</strong> i, si vols, apunta <strong>què va portar</strong>. Clica <strong>Apuntar-ho</strong>.</p>
+      <p>A la dreta, <strong>com va la temporada</strong>: quantes reunions hi ha apuntades, quants esmorzars s'han dut, quants oblits i la nota mitjana de l'equip. A sota, la taula amb la <strong>nota mitjana de cadascú</strong> —amb una barra, ordenats de més a menys—, quants n'ha dut i els seus gomets. I més avall, els últims esmorzars, amb la × per treure un apunt equivocat.</p>
+      <div class="callout tip">
+        <strong>Els gomets vermells:</strong> cada vegada que algú no porta l'esmorzar se li'n posa un al costat del nom. <strong>Als 3 gomets, penyora</strong>, i l'app t'ho farà saber. Què és la penyora ja ho decidiu vosaltres.
+      </div>
+
+      <h4 id="docents-torn">Qui li toca la setmana que ve</h4>
+      <p>A dalt de tot hi ha el botó <strong>Qui li toca la setmana que ve?</strong>. L'app diu el nom: és <strong>a qui li ha tocat menys vegades</strong>, i si n'hi ha uns quants empatats, al que fa més temps que no li toca. Amb les mateixes dades sempre dona el mateix nom, o sigui que no hi ha res a discutir.</p>
+      <ul>
+        <li>Posa-hi el <strong>dia de la reunió</strong> i clica <strong>Apuntar el torn</strong>.</li>
+        <li>Si aquell dia no hi serà, <strong>Aquell dia no hi serà</strong> passa al següent de la llista.</li>
+        <li>Un cop apuntat, la targeta et diu quin dia li arribarà l'avís. Amb <strong>Treure el torn</strong> el pots desfer.</li>
+      </ul>
+      <div class="callout tip">
+        <strong>El correu li arriba sol.</strong> El <strong>dilluns</strong> d'aquella setmana l'app li envia un correu recordant-li que li toca portar l'esmorzar (i, si en té, li recorda els gomets que porta). No has de fer res. Si el vols avançar, hi ha <strong>Enviar-li l'avís ara</strong>.
+      </div>
+      <div class="callout">
+        <strong>Els correus dels cinc ja hi són.</strong> Si algun dia canvia l'equip de coordinació, digues-ho a en Pol: els correus es mantenen des del codi, com la resta del llistat. Si a la targeta hi diu que no se sap el correu d'algú, l'avís no li pot arribar, però la resta funciona igual.
+      </div>
+
+      <h4 id="docents-palmares">El palmarès</h4>
+      <p>A baix de tot, quan ja hi hagi unes quantes reunions apuntades, surt el <strong>palmarès</strong>: l'esmorzar de l'any, la millor mitjana, el més constant i el rei de l'oblit. Va canviant tot el curs; el del juny és el que compta.</p>
+      <div class="callout">
+        <strong>Ho veieu tots dos.</strong> Els esmorzars es desen al full compartit de l'escola, no al teu: tant si ho apuntes tu com l'altra persona de direcció, tots dos veieu la mateixa llista.
+      </div>
+      <h3 id="docents-registres">Registres</h3>
+      <p>És <strong>igual que els <a href="#registres">registres d'aula</a></strong>, però a les files hi ha <strong>tot el claustre</strong> en comptes dels alumnes. Serveix per a qualsevol cosa que s'hagi de portar per mestre: qui ha entregat una cosa, qui ha fet una formació, qui ha passat el full…</p>
+      <ul>
+        <li><strong>Nou ítem de seguiment</strong> crea una columna nova. Tries si és una <strong>casella</strong> (sí/no) o un <strong>text lliure</strong>, igual que als registres d'aula.</li>
+        <li>Les caselles i els textos <strong>es desen sols</strong>: a dalt hi diu «Desat ✓» quan ja hi és.</li>
+        <li>La <strong>×</strong> de la capçalera esborra la columna i tot el que hi tinguis apuntat.</li>
+        <li>Al costat de cada nom hi surt el seu grup (o si és especialista o SIEI), per trobar la fila de pressa amb 40 mestres.</li>
+      </ul>
+      <div class="callout">
+        <strong>Ho veieu tots dos.</strong> Com els esmorzars, es desa al full compartit de l'escola: tant si ho apuntes tu com l'altra persona de direcció, tots dos veieu el mateix. Si en algun moment no quadra, clica <strong>Sincronitzar</strong>.
+      </div>
+      <div class="callout warn">
+        <strong>No hi posis res delicat.</strong> Com que va al full compartit de l'escola, un mestre que obri aquell full de càlcul ho podria arribar a llegir. Per a coses de seguiment del dia a dia va bé; per a res sensible, digues-ho a en Pol i es mourà a un lloc només vostre.
+      </div>
+
+      <h3 id="docents-seg-entrevistes">Seguiment d'entrevistes</h3>
+      <p>De cada tutor, <strong>quantes entrevistes ha fet amb les famílies i quan</strong>, i quins alumnes encara no en tenen cap. És d'on surten les dades quan us en demanen.</p>
+      <p>A dalt hi ha els números de tota la primària: entrevistes fetes, alumnes amb entrevista, <strong>alumnes sense cap</strong>, el tant per cent cobert i quants grups encara no n'han fet cap.</p>
+      <ul>
+        <li>La taula va ordenada amb <strong>els grups que van més endarrerits primer</strong>, amb el nom del seu tutor al costat.</li>
+        <li><strong>Clica un grup</strong> i s'obre alumne per alumne: primer els que no en tenen cap, i de cada un les dates de les seves entrevistes.</li>
+        <li><strong>Només amb pendents</strong> deixa només els grups on falta algú.</li>
+        <li><strong>Copiar el resum</strong> se't posa al porta-retalls el resum sencer (una fila per grup) per enganxar-lo on el necessitis.</li>
+        <li><strong>Actualitzar</strong> torna a llegir els 18 grups. Pot trigar uns segons: són moltes dades.</li>
+      </ul>
+      <div class="callout warn">
+        <strong>Què hi veus i què no.</strong> Hi arriba <strong>quantes</strong> entrevistes ha fet cada tutor i <strong>quan</strong>. El que el tutor hagi apuntat de com va anar l'entrevista es queda al seu full: no ho veus, i és a posta.
+      </div>
+      <div class="callout">
+        <strong>Els primers dies pot ser que a algun alumne només hi surti l'última data.</strong> Les dates de totes les entrevistes s'hi van posar el setembre del 2026; les d'abans només tenien el compte i l'última. Es posa al dia sol: quan aquell tutor desi qualsevol entrevista, totes les seves dates hi apareixen de cop.
+      </div>
+
+    </section>
+
+    <!-- 12. OBSERVACIONS -->
+    <section id="observacions">
+      <h2>12. Observacions</h2>
+      <p>Una graella per apuntar observacions de cada alumne, organitzades per assignatura i trimestre. Serveix per anar recollint apunts durant el curs que després t'ajudaran a fer els informes.</p>
+      <p>Les observacions surten també a la fitxa de cada alumne, agrupades per trimestre.</p>
+      <div class="callout">
+        <strong>Si ets especialista</strong>, a dalt de tot de la pàgina hi tens un desplegable d'<strong>assignatura i grup</strong> («Música · 3r A»): tria'l i la graella et deixa <strong>els alumnes que tens tu en aquella classe</strong>. Si l'assignatura és desdoblada, hi surten els del teu mig grup, no la classe sencera. També pots escriure una observació sense passar per aquí: obre l'assignatura, clica <strong>Veure alumnes</strong> → <strong>Fitxa</strong> → <strong>Afegir observació</strong>.
+      </div>
+      <div class="callout">
+        <strong>Si ets de direcció</strong>, la graella és la del grup que tinguis triat a <a href="#alumnes-direccio">Alumnes</a>, amb tots els seus alumnes. Hi tens l'opció <strong>General</strong> (una observació que no és de cap assignatura) i també les teves assignatures. Per mirar un altre grup, canvia'l a Alumnes.
+      </div>
+      <div class="callout">
+        <strong>Són compartides, i és volgut.</strong> Si tu apuntes que un nen gira el 6, la mestra que li fa Anglès també ho veurà i ho podrà tenir en compte. Això és justament la gràcia: que la informació de l'alumne no es quedi tancada a la llibreta d'una sola persona.
+      </div>
+      <div class="callout warn">
+        <strong>Escriu-hi pensant que ho llegirà una companya.</strong> Ara mateix les observacions <strong>no guarden qui les ha escrit</strong>, així que no se sap de qui és cada apunt. Escriu-hi el que serveixi per ajudar el nen, en to professional, com ho faries en una junta d'avaluació.
+      </div>
+
+      <h3 id="obs-moure">Corregir una observació que has posat al nen equivocat</h3>
+      <p>Passa: l'apuntes de pressa i te n'adones després. Obre-la amb el <strong>llapis</strong> i canvia el que calgui als tres desplegables de dalt —<strong>alumne</strong>, <strong>assignatura</strong> o <strong>trimestre</strong>—, i desa.</p>
+      <ul>
+        <li>L'observació <strong>es mou</strong>: apareix on l'has enviada i <strong>desapareix d'on era</strong>. No en queden dues.</li>
+        <li>Si al lloc on la portes ja n'hi havia una, <strong>et pregunta</strong> abans de substituir-la i te la deixa llegir.</li>
+      </ul>
+      <div class="callout warn">
+        Fins a la versió 218 aquells desplegables es veien actius i <strong>no servien de res</strong>: el text tornava al nen d'abans i s'emportava el que hi tenia. Si algun dia t'hi va passar, mira aquella observació.
+      </div>
+
+      <div class="callout tip">
+        Si tanques la finestra amb una observació a mig escriure —amb la <strong>×</strong>, amb <strong>Escape</strong> o amb el gest d'<strong>enrere</strong> del mòbil— l'app <strong>et pregunta</strong> abans de llençar-la. Igual si recarregues la pàgina.
+      </div>
+    </section>
+
+    <!-- 12. NOTES -->
+    <section id="assignatures">
+      <h2>13. Notes d'assignatures</h2>
+      <p>Cada assignatura que fas té la seva graella de qualificacions per trimestre. S'hi entra des del bloc <strong>Assignatures</strong> del menú, que es genera del teu <a href="#perfil">perfil</a>.</p>
+
+      <h3>Afegir ítems avaluables</h3>
+      <p>Clica <strong>Afegir ítem</strong> per crear una columna nova (un examen, un treball, una activitat…). Cada ítem té:</p>
+      <ul>
+        <li><strong>Nom</strong> de la prova o activitat.</li>
+        <li><strong>Punts màxims</strong> (sobre quant es puntua).</li>
+        <li><strong>Pes</strong> (quant compta per a la mitjana).</li>
+      </ul>
+      <p>Introdueixes els punts de cada alumne i l'app calcula sola la nota sobre 10, la mitjana ponderada i la nota final arrodonida. Pots marcar una activitat com a <strong>NE</strong> (No Entregada): compta com a 0 però queda registrada com a no entregada, i es veu a la fitxa de l'alumne.</p>
+      <div class="callout tip">
+        <strong>Pots passar la llista amb la roda del ratolí sense por.</strong> Fins a la versió 218, si el punter es quedava damunt d'una casella que acabaves de tocar, la roda li canviava la nota —i la desava— sense que ho veiessis. Ara, en rodar, la casella deixa el focus i la pàgina baixa i prou. El mateix a la graella d'<a href="#actitud">Actitud</a>.
+      </div>
+      <div class="callout">
+        Dues activitats no es poden dir igual: si ho proves, t'ho diu. Amb dues columnes «Prova» no hi hauria manera de saber quina és quina, ni aquí ni al full.
+      </div>
+      <div class="callout warn">
+        <strong>Si a secretaria li canvien el nom a un alumne</strong> (un accent, un segon cognom) les notes que ja té al full es queden sota el nom vell i aquí no te les puc ensenyar. Quan passa, t'ho dic amb el nom que no em quadra: les notes hi són, i tornen a sortir quan els dos noms coincideixen.
+      </div>
+
+      <h3 id="coment-activitat">Comentari de cada alumne sobre cada activitat</h3>
+      <p>A part de la nota, pots deixar escrit <strong>com li ha anat aquella activitat a aquell nen</strong>.</p>
+      <ol class="step-list">
+        <li>Clica la <strong>icona de bafarada</strong> que hi ha a la casella de la nota.</li>
+        <li>Escriu-hi el que vulguis. Per exemple: «Ha entès el procediment però s'ha encallat amb els problemes llargs».</li>
+        <li>Desa (o prem <code>Ctrl+Enter</code>).</li>
+      </ol>
+      <ul>
+        <li>La icona es <strong>marca</strong> quan la casella té comentari, així veus d'un cop d'ull de qui n'has escrit.</li>
+        <li>Passant-hi el ratolí per sobre en veus el text sense haver d'obrir res.</li>
+        <li>Per esborrar-lo, obre'l i clica <strong>Esborrar</strong>.</li>
+      </ul>
+      <div class="callout tip">
+        Aquests apunts es desen com a <strong>nota de la mateixa cel·la del full de càlcul</strong>, així que també els veus obrint el Sheets, al costat de la nota. I, sobretot, el <a href="#comentaris">generador de comentaris</a> els pot fer servir per escriure l'informe de trimestre molt més concret.
+      </div>
+
+      <h3 id="notes-compartir">Compartir-les amb el tutor/a</h3>
+      <p>Un tutor pot veure com va el seu alumne a totes les assignatures, tamb&eacute; a les que li fa una altra mestra. Per&ograve; <strong>nom&eacute;s si la mestra ho vol</strong>.</p>
+      <p>A les notes de cada assignatura hi ha la casella <strong>&laquo;Compartir aquestes notes amb el tutor/a del grup&raquo;</strong>. <strong>Ve desmarcada.</strong></p>
+      <ul>
+        <li><strong>Desmarcada:</strong> el tutor/a nom&eacute;s veu que aquella assignatura existeix i que hi diu &laquo;Notes no compartides&raquo;. Cap nota teva no surt del teu full.</li>
+        <li><strong>Marcada:</strong> el tutor/a veu <strong>la nota de cada trimestre</strong>, i prou. <strong>Mai els ex&agrave;mens ni el detall.</strong></li>
+      </ul>
+      <div class="callout warn">
+        <strong>Si al grup hi ha dos alumnes amb el mateix nom i cognom</strong>, aquells dos no es comparteixen: l&#39;app no pot saber de qui &eacute;s cada nota i no se la juga. T&#39;avisa en marcar la casella, i es resol posant-hi el segon cognom al full del grup.
+      </div>
+      <div class="callout tip">Si la desmarques, les notes que ja s&#39;havien compartit <strong>s&#39;esborren</strong> del full compartit a l&#39;instant. No es queden all&agrave; &laquo;per si de cas&raquo;.</div>
+      <div class="callout warn">Les notes que comparteixes les veu <strong>nom&eacute;s el tutor/a d&#39;aquell grup</strong>. Cap altra mestra no hi t&eacute; acc&eacute;s: una especialista nom&eacute;s veu les notes de les assignatures que fa ella.</div>
+      <div class="callout">La casella nom&eacute;s surt a les assignatures d&#39;un grup <strong>del qual no ets tutor/a</strong>: les del teu grup ja les veus tu. I no surt a les assignatures de grup rotatori (Tallers), perqu&egrave; els alumnes van canviant.</div>
+      <p>Quan la tens marcada, cada cop que entres notes es torna a publicar el resum sol. No has de fer res m&eacute;s.</p>
+
+      <h3 id="actitud">Actitud</h3>
+      <p>Cada assignatura té un apartat d'actitud amb diversos aspectes puntuables de l'1 al 10. L'app en calcula la mitjana, que s'incorpora a la nota final amb el seu pes, com una columna més.</p>
+      <div class="callout">
+        <strong>Els aspectes els tries tu.</strong> Per defecte són Participació, Atenció, Comportament, Saber estar i Realització d'activitats, però a <strong>Configuració → Aspectes d'actitud</strong> els pots reanomenar, treure'n o afegir-ne els que vulguis. No cal que en siguin cinc.
+      </div>
+
+      <h3 id="carpeta">Carpeta Viatgera</h3>
+      <p>Algunes assignatures tenen la columna especial de <strong>Carpeta Viatgera</strong>, un ítem amb el seu propi pes que s'integra al càlcul de la nota final i que va sempre al final de la graella.</p>
+
+      <div class="callout tip">
+        Totes les graelles del Google Sheets es formaten soles: capçaleres en granat, tot centrat, i les columnes de mitjana i nota amb fons gris clar per indicar que es calculen automàticament.
+      </div>
+    </section>
+
+    <!-- 13. ASSOLIMENTS -->
+    <section id="assoliments">
+      <h2>14. Assoliments</h2>
+      <p>Sistema per avaluar objectius competencials per assignatura i trimestre. Cada objectiu té un nom curt i una descripció (clica la ⓘ per veure-la).</p>
+      <p>Per cada alumne i objectiu marques un valor, que va canviant cada cop que hi cliques:</p>
+      <ul>
+        <li><span class="feature-icon">✓</span> Assolit (verd)</li>
+        <li><span class="feature-icon">~</span> Assolit parcialment (groc)</li>
+        <li><span class="feature-icon">✗</span> No assolit (vermell)</li>
+        <li><span class="feature-icon">—</span> Sense avaluar (gris)</li>
+      </ul>
+      <p>L'app calcula un <strong>percentatge d'assoliment</strong> per cada alumne, que surt també a la seva fitxa. Tot es <strong>sincronitza sol</strong> a un full visible i acolorit del Google Sheets cada cop que marques una cel·la o edites un objectiu; no cal clicar cap botó de desat.</p>
+    </section>
+
+    <!-- 14. REGISTRES -->
+    <section id="registres">
+      <h2>15. Registres d'aula</h2>
+      <p>Una graella flexible per registrar qualsevol cosa del dia a dia: qui ha portat el material, qui ha fet els deures, control de lectures, els diners de la sortida… Cada columna pot ser una <strong>casella de verificació</strong> o un <strong>camp de text</strong>, i s'aplica a tots els alumnes.</p>
+      <p>És l'apartat més lliure de l'app: el fas servir per al que et convingui.</p>
+      <div class="callout">
+        <strong>Si ets especialista</strong>, a dalt de tot hi ha un desplegable d'<strong>assignatura i grup</strong>: <strong>cada assignatura teva a cada grup té el seu registre</strong>, amb les seves columnes i les seves creus. Així el control de la flauta de Música 3r A no es barreja amb el de 3r B ni amb el dossier d'Anglès. Recorda triar-ho abans de posar-hi res.
+      </div>
+      <div class="callout">
+        <strong>Si ets de direcció</strong>, el registre és el del grup que tinguis triat a <a href="#alumnes-direccio">Alumnes</a>, i <strong>cada grup té el seu</strong>: les columnes i les creus de 4t B no es barregen amb les de 2n A.
+      </div>
+      <div class="callout tip">
+        <strong>Va per assignatura i no només per grup a posta:</strong> si l'Anglès de 3r A és desdoblat i tu en fas mig grup, al registre hi has de tenir els teus alumnes i no els vint-i-cinc de la classe. Per això el registre segueix el desdoblament, com les notes.
+      </div>
+    </section>
+
+    <!-- 15. GRUPS -->
+    <section id="grups">
+      <h2>16. Generador de grups</h2>
+      <p>Eina per formar grups de treball automàticament. A dalt tries l'<strong>assignatura</strong>, i l'app carrega els alumnes reals d'aquell grup tenint en compte els desdoblaments (així pots fer grups diferents per a cada matèria). Després indiques quants alumnes vols per grup.</p>
+
+      <h3>Homogenis o heterogenis</h3>
+      <ul>
+        <li><strong>Homogenis:</strong> repartiment aleatori, sense mirar el nivell. Ideal per a activitats disteses.</li>
+        <li><strong>Heterogenis:</strong> grups equilibrats perquè cadascun tingui de tot. Reparteix primer els alumnes amb PI, un a cada grup; després els d'AM; i la resta <strong>ordenats per la seva nota real</strong> de l'assignatura, de manera que a cada grup hi hagi nivells barrejats.</li>
+      </ul>
+      <div class="callout">
+        Els grups heterogenis agafen la <strong>nota mitjana que tens entrada</strong> d'aquella assignatura. Com més notes tinguis posades, millor equilibrarà. Si encara no n'hi ha cap, reparteix igualment els PI i els AM i t'avisa que no ha pogut equilibrar per nivell.
+      </div>
+
+      <h3>Condicions</h3>
+      <p>Pots definir <strong>incompatibilitats</strong> (alumnes que no han d'anar junts) i regenerar tantes vegades com vulguis fins a trobar una distribució que t'agradi.</p>
+      <div class="callout tip">
+        El botó <strong>↺ Regenerar</strong> dels heterogenis ara sí que et dona un repartiment <strong>diferent</strong> cada vegada, igualment equilibrat per nivell. Fins a la versió 218 tornava sempre exactament els mateixos grups, i semblava espatllat.
+      </div>
+    </section>
+
+    <!-- 16. SEIENTS -->
+    <section id="seients">
+      <h2>17. Distribució de l'aula</h2>
+      <div class="callout">
+        <strong>Si ets especialista</strong> aquesta eina no et surt al menú: està feta per a una sola aula i un sol grup, el de la teva tutoria. Si et fes servei tenir un plànol per a cada grup, digues-ho a en Pol.
+      </div>
+      <div class="callout">
+        <strong>Si ets de direcció</strong> sí que la tens, i el plànol és el del grup que tinguis triat a <a href="#alumnes-direccio">Alumnes</a>: <strong>cada grup té el seu</strong>, amb les seves taules i els seus marcadors. A dalt de la pàgina hi diu de quin grup és el que estàs tocant.
+      </div>
+      <p>Eina per decidir on seu cada alumne. Munta el plànol de la teva aula i deixa que l'app reparteixi els alumnes tenint molt en compte les <a href="#seient-cond">condicions de seient</a> de cadascun.</p>
+
+      <h3>Moure un alumne de lloc</h3>
+      <p>Amb el <strong>ratolí</strong>, arrossega'l on el vulguis, com sempre.</p>
+      <p>Amb el <strong>dit</strong> (tauleta o mòbil), arrossegar no funciona: <strong>toca el nen</strong> —es marca amb una vora granat— i tot seguit <strong>toca el lloc</strong> on el vols. Si el lloc ja està ocupat, els dos es canvien. Per deixar-ho estar, torna a tocar el mateix nen.</p>
+      <div class="callout tip">
+        Quan tens algú triat, sota la llista d'«Alumnes sense lloc» hi surt qui és. Si no hi surt res, és que no has triat ningú.
+      </div>
+      <div class="callout">
+        Cada <strong>fila de taules</strong> nova surt <strong>sota</strong> de les que ja hi ha, ben separada; quan el taulell s'acaba per avall, comença una columna a la dreta. Fins a la versió 218 sortien unes damunt de les altres i la meitat dels alumnes quedaven tapats i no es podien ni tocar.
+      </div>
+
+      <h3>Muntar el plànol</h3>
+      <p>Crea files de taules i arrossega-les pel taulell per reproduir la disposició real de la teva aula (files, illes, forma d'U…). Després col·loca els tres <strong>marcadors</strong> —la taula del mestre, la porta i les finestres— i arrossega'ls on toqui. Serveixen perquè l'app calculi distàncies reals.</p>
+      <div class="callout">
+        El plànol i els marcadors <strong>es desen sols</strong>. Els tornaràs a trobar tal com els vas deixar, també si entres des d'un altre dispositiu.
+      </div>
+
+      <h3>Repartir els alumnes</h3>
+      <p>Clica <strong>Repartir alumnes</strong> i l'app col·loca cadascun segons les seves condicions:</p>
+      <ul>
+        <li>Els alumnes <strong>fixats</strong> mantenen el seu lloc.</li>
+        <li>Els que tenen més condicions s'assignen primer, per garantir que troben lloc.</li>
+        <li>Es respecta al màxim «a prop del mestre», «lluny de la porta», «lluny de les finestres» i les incompatibilitats.</li>
+        <li>Si alguna condició no s'ha pogut complir per falta de llocs adequats, l'app t'avisa de quina.</li>
+      </ul>
+      <div class="callout">
+        Aquesta eina treballa amb <strong>tots</strong> els alumnes del teu grup de tutoria, sense aplicar desdoblaments: a l'aula hi seuen tots.
+      </div>
+    </section>
+
+    <!-- 17. POST-ITS -->
+    <section id="postits">
+      <h2>18. Notes i post-its</h2>
+      <p>Un taulell de post-its per apuntar idees ràpid, recordatoris o qualsevol cosa que no vulguis oblidar. Es guarden sols al núvol, així que els tens a qualsevol dispositiu.</p>
+      <div class="callout tip">
+        <strong>Canviar-les d'ordre amb el dit:</strong> toca la nota que vols moure i després toca on la vols posar. Amb el ratolí, arrossega-la com sempre.
+      </div>
+      <ol class="step-list">
+        <li>Clica <strong>Nou post-it</strong>, posa-hi un títol (opcional) i el text.</li>
+        <li>Tria'n el <strong>color</strong> (sis colors disponibles).</li>
+        <li>Opcionalment, posa-hi una <strong>data de recordatori</strong> i marca'l com a <strong>important</strong>.</li>
+      </ol>
+      <ul>
+        <li>Els <strong>importants</strong> van sempre a dalt de tot, amb una xinxeta 📌.</li>
+        <li>Pots <strong>arrossegar-los</strong> per reordenar-los com vulguis.</li>
+        <li>Els que tenen <strong>recordatori</strong> mostren la data, que es torna vermella el dia assenyalat. En obrir l'app, t'avisa dels que vencen aquell dia.</li>
+        <li>Passa el ratolí per sobre (o toca) per <strong>editar-los</strong> o <strong>esborrar-los</strong>.</li>
+      </ul>
+    
+      <h3 id="postits-llistes">Llistes de coses a fer</h3>
+      <p>Una nota pot ser una <strong>llista</strong>: coses a fer, idees, el que et vingui de gust. En crear-la o editar-la, a <strong>Llista</strong> escriu-hi una cosa i prem <strong>Enter</strong>; el camp es buida i ja pots escriure la següent, o sigui que en pots posar sis seguides sense tocar el ratolí.</p>
+      <ul>
+        <li>Les línies surten al post-it amb una <strong>casella</strong>: les marques <strong>des del taulell mateix</strong>, sense obrir la nota.</li>
+        <li>El que marques <strong>es desa sol</strong>. A sota hi tens el compte («2 de 5»), i quan estan totes fetes hi diu <strong>«Fet ✓»</strong>.</li>
+        <li>Una nota pot ser <strong>només llista</strong>, sense text: un títol i les línies.</li>
+      </ul>
+      <div class="callout tip">
+        Les notes de sempre no canvien gens: si no hi poses cap línia, el post-it és exactament el d'abans.
+      </div>
+</section>
+
+    <!-- 18. COMENTARIS -->
+    <section id="comentaris">
+      <h2>19. Generador de comentaris</h2>
+      <p>Genera els comentaris d'informe de final de trimestre a partir dels teus objectius d'avaluació. La feina de redactar te la fa; les valoracions les poses tu.</p>
+      <ol class="step-list">
+        <li>Tria el <strong>trimestre</strong>. Surt marcat el que toca ara (al juliol i a l'agost, el que s'acaba de tancar). D'això depèn el que hi entra: els teus apunts d'aquell trimestre i com es redacta el text.</li>
+        <li>Tria l'<strong>assignatura</strong> i l'<strong>alumne</strong>. Les assignatures són les del teu <a href="#perfil">perfil</a>: si una la fas a un curs que no és la teva tutoria, hi surt el curs al costat («Música · 5è»). En canviar d'assignatura, la llista d'alumnes canvia sola als d'aquell curs.</li>
+        <li>Per cada objectiu, marca un dels quatre nivells: Molt ben assolit (MBA), Assolit (AS), Assolit amb ajuda (AAJ) o No assolit (NA). Passa el ratolí per sobre per veure la frase completa de cada nivell.</li>
+        <li>Clica <strong>Generar comentari</strong>.</li>
+      </ol>
+      <p>L'app agafa els criteris que has marcat, els ordena (comença pel positiu i acaba amb el que cal reforçar), hi posa l'article i el nom correctes de l'alumne, i te'n dona un comentari cohesionat en una finestra emergent.</p>
+      <ul>
+        <li>El comentari és <strong>editable</strong> abans de copiar-lo: sempre en tens el control final.</li>
+        <li>El botó <strong>Regenerar</strong> te'n fa un de nou, redactat diferent.</li>
+        <li><strong>Reiniciar</strong> esborra les valoracions marcades per començar de zero.</li>
+        <li>Si deixes algun objectiu sense marcar, l'app t'avisa per si te'l vas descuidar.</li>
+        <li>Si la IA no està disponible en aquell moment, obtens igualment un esborrany amb totes les idees ordenades, que pots copiar i polir.</li>
+      </ul>
+      <div class="callout">
+        Els comentaris <strong>no surten tots amb la mateixa estructura</strong>: l'app va alternant maneres de començar i d'encadenar les idees, i té en compte les notes que has posat. Així no es nota que estan fets en sèrie.
+      </div>
+      <div class="callout warn">
+        <strong>Recorda:</strong> revisa sempre el comentari abans de copiar-lo a l'informe. Tu ets qui el signa; la IA només t'estalvia temps de redacció.
+      </div>
+
+      <h3 id="objectius">Els meus objectius</h3>
+      <p>Els objectius i els seus criteris <strong>són teus</strong>: cada mestra té els seus. Al costat del selector d'assignatura hi ha el botó <strong>Editar objectius</strong>.</p>
+      <p>Cada objectiu té:</p>
+      <ul>
+        <li>Un <strong>nom</strong> (per exemple, «Sumes amb i sense portar-ne»).</li>
+        <li>Quatre <strong>criteris</strong>, un per nivell: què vol dir tenir-ho molt ben assolit, assolit, assolit amb ajuda o no assolit.</li>
+      </ul>
+      <p>Aquests criteris són les frases que després el generador convertirà en el comentari, així que val la pena escriure'ls bé un cop: els reaprofites tot el curs i tots els cursos.</p>
+      <div class="callout">
+        Els objectius van <strong>per assignatura i per curs</strong>. Si fas la mateixa matèria a dos cursos, cadascun té els seus (els de Música de 3r no són els de 5è).
+      </div>
+
+      <h3 id="copiar">Copiar-los d'una altra assignatura</h3>
+      <p>Si ja els tens escrits en una altra assignatura teva —típicament <strong>la mateixa matèria en un altre curs</strong>— no els reescriguis: <strong>Editar objectius → Copiar d'una altra</strong>.</p>
+      <p>Et surten les teves altres assignatures que ja tenen objectius, amb quants en tenen. Les de la mateixa matèria van primer, marcades.</p>
+      <ul>
+        <li>Si l'assignatura on ets encara <strong>està buida</strong>, el botó diu <strong>Copiar</strong> i ja està.</li>
+        <li>Si <strong>ja hi tens objectius</strong>, tries: <strong>Afegir als meus</strong> (els posa a continuació) o <strong>Substituir</strong> (et pregunta abans, dient-te quants en perds).</li>
+      </ul>
+      <div class="callout tip">
+        És una <strong>còpia</strong>, no un enllaç: després els retoques per adaptar-los al curs i <strong>l'assignatura d'origen no es toca</strong>. Aquesta és la gràcia — parteixes del que ja tenies i només canvies el que canvia.
+      </div>
+      <p>Recorda clicar <strong>Desar</strong> quan els hagis repassat.</p>
+      <div class="callout">
+        <strong>La primera vegada estarà buit</strong>, i és normal. O els escrius un a un, o —molt més ràpid— els <a href="#importar">importes d'un document</a>.
+      </div>
+
+      <h3 id="importar">Importar-los d'un document</h3>
+      <p>Si ja tens els objectius escrits en un document de Word, un Google Docs o un full de càlcul, no els reescriguis: <strong>Editar objectius → Importar d'un document</strong>.</p>
+      <ol class="step-list">
+        <li>Obre el teu document i <strong>copia la taula</strong> (o les files) amb els objectius i els criteris.</li>
+        <li><strong>Enganxa-la</strong> al quadre de text que t'apareix.</li>
+        <li>Clica <strong>Importar</strong>.</li>
+      </ol>
+      <p>L'app espera <strong>una fila per objectiu</strong>, amb aquestes cinc columnes en aquest ordre:</p>
+      <table>
+        <tr><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr>
+        <tr><td>Objectiu</td><td>Molt ben assolit</td><td>Assolit</td><td>Assolit amb ajuda</td><td>No assolit</td></tr>
+      </table>
+      <p>Detecta sola si les columnes van separades per tabuladors (una taula de Word o un full de càlcul), per punt i coma o per un altre separador, i t'ho diu. Si hi ha una primera fila de capçalera, també la reconeix i no la compta com a objectiu.</p>
+      <div class="callout tip">
+        Després d'importar t'avisa de quants objectius ha trobat i de si n'hi ha algun <strong>sense criteris</strong>. Els pots acabar d'escriure allà mateix. Un objectiu sense criteris no serveix per generar comentaris.
+      </div>
+
+      <h3 id="estil">La meva manera d'escriure</h3>
+      <p>Aquest és el botó que fa que els comentaris <strong>sonin a tu i no a una màquina</strong>. És al costat d'«Editar objectius».</p>
+      <ul>
+        <li><strong>Comentaris teus d'exemple:</strong> enganxa-hi dos o tres comentaris que hagis escrit tu altres anys. <strong>No es copien</strong>: només serveixen perquè vegi com escrius —quines paraules fas servir, com comences, com dius les coses delicades.</li>
+        <li><strong>Llargada:</strong> curt (3–4 línies), mitjà (5–7) o llarg (8–10).</li>
+        <li><strong>To:</strong> professional però proper, proper i càlid, o formal.</li>
+        <li><strong>Alguna cosa més a tenir en compte:</strong> camp lliure per a les teves manies. Per exemple: «no facis servir mai la paraula alumne, digues sempre el nom».</li>
+      </ul>
+      <p>Es configura un cop i val per a tots els comentaris que generis.</p>
+
+      <h3 id="apunts">Els apunts de les activitats</h3>
+      <p>Sota els selectors hi ha la casella <strong>«Tenir en compte els meus apunts de les activitats»</strong>.</p>
+      <p>Si la marques, el generador llegirà també els <a href="#coment-activitat">comentaris que has anat escrivint activitat per activitat</a> d'aquell alumne en aquella assignatura, i en sortirà un comentari molt més concret: en comptes de dir «li costen els problemes», podrà dir per què i en quin moment.</p>
+      <ul>
+        <li>Al costat de la casella et diu <strong>quants apunts</strong> ha trobat d'aquell alumne. Si no n'hi ha cap, marcar-la no canvia res.</li>
+        <li>La decisió és teva i es recorda: si no vols que els faci servir, deixa-la desmarcada.</li>
+      </ul>
+      <div class="callout tip">
+        Val molt la pena: són trenta segons per activitat durant el trimestre que t'estalvien mitja tarda al desembre.
+      </div>
+    </section>
+
+    <!-- 19. REUNIONS -->
+    <section id="reunions">
+      <h2>20. Convocar reunions</h2>
+      <p>Serveix per no haver de fer vint correus per quadrar les reunions de tutoria. Tu marques quan tens lliure, l&#39;app et dona un <strong>enlla&ccedil;</strong>, l&#39;envies a les fam&iacute;lies i cadascuna tria la seva hora. La reserva et va sola al <strong>teu Google Calendar</strong>.</p>
+      <p>La trobar&agrave;s a <strong>Eines &rarr; Convocar reunions</strong>.</p>
+
+      <h3 id="reunions-crear">Crear un calendari de reunions</h3>
+      <p>Es fa en dos passos, i el segon &eacute;s el que et salvar&agrave; el dia.</p>
+
+      <h4>Pas 1 &mdash; Quan tens lliure</h4>
+      <ol class="step-list">
+        <li>Clica <strong>+ Nou calendari</strong> i posa-hi el <strong>t&iacute;tol</strong> (&eacute;s el que veuran les fam&iacute;lies i el que sortir&agrave; al teu calendari).</li>
+        <li>Digues <strong>de quin dia a quin dia</strong> vols oferir hores.</li>
+        <li>Tria <strong>quant dura</strong> cada reuni&oacute; i si vols un <strong>descans entremig</strong> (molt recomanable: si no, t&#39;encadenes reunions sense respirar).</li>
+        <li>A <strong>&laquo;Quines hores tens lliures cada dia&raquo;</strong> hi ha un rengle per cada dia de la setmana. <strong>Marca els dies</strong> que t&#39;interessin i posa-hi la teva hora.</li>
+      </ol>
+      <div class="callout tip">
+        <strong>Cada dia pot ser diferent</strong>, perqu&egrave; els horaris reals ho s&oacute;n: dilluns a les 11, dimarts a les 15, dimecres nom&eacute;s al migdia. Marques el dia i hi poses la seva hora, i prou.
+        <br><br>
+        Si un dia tens <strong>dues estones</strong> (per exemple mat&iacute; i tarda), clica <strong>&laquo;+ una altra estona&raquo;</strong> en aquell dia. I si diversos dies tenen la mateixa hora, posa-la a un i clica <strong>&laquo;copiar als altres&raquo;</strong>.
+      </div>
+
+      <h4>Pas 2 &mdash; Repassa i treu el que no et vagi</h4>
+      <p>Clica <strong>Veure les hores &rarr;</strong> i et sortiran <strong>totes les hores que s&#39;oferiran, dia per dia</strong>. Aqu&iacute; &eacute;s on arregles els imprevistos:</p>
+      <ul>
+        <li><strong>Clica una hora per treure-la.</strong> Queda ratllada i no s&#39;oferir&agrave;. Torna-hi a clicar si canvies d&#39;opini&oacute;.</li>
+        <li>&Eacute;s el cas de &laquo;ofereixo els dimecres al migdia, per&ograve; just el dia 16 no puc&raquo;: treus nom&eacute;s aquella, i els altres dimecres es queden.</li>
+        <li>Les que <strong>ja tens ocupades</strong> al Google Calendar surten en groc i ratllades: no s&#39;ofereixen i no les has de tocar.</li>
+      </ul>
+      <p>A dalt hi tens sempre el compte: quantes hores s&#39;oferiran, quantes has tret tu i quantes s&#39;han saltat. Quan et vagi b&eacute;, <strong>Crear i generar l&#39;enlla&ccedil;</strong>.</p>
+      <div class="callout">
+        El que veus en aquest pas &eacute;s <strong>exactament</strong> el que es crear&agrave;: la llista la calcula el mateix servidor que despr&eacute;s les guarda.
+      </div>
+
+      <h3 id="reunions-treure">Treure una hora quan ja has enviat l&#39;enlla&ccedil;</h3>
+      <p>Passa sovint: has enviat el correu i et surt una reuni&oacute;, una visita o el que sigui.</p>
+      <p>A la fitxa del calendari hi tens <strong>&laquo;Les hores d&#39;aquest calendari&raquo;</strong>: un <strong>calendari del mes</strong> on cada dia et diu quantes hores hi tens. El n&uacute;mero <strong>verd</strong> s&oacute;n les que encara estan lliures i el <strong>vermell</strong> les que ja ha agafat alg&uacute;.</p>
+      <p><strong>Clica el dia</strong> i a sota et sortiran les seves hores. Llavors <strong>clica l&#39;hora que ja no pots fer</strong>, confirma, i deixa de sortir a les fam&iacute;lies a l&#39;instant.</p>
+      <div class="callout tip">
+        Les hores nom&eacute;s surten del dia que hagis clicat. Aix&iacute; no has de baixar per una llista de dues-centes hores per trobar-ne una: mires el mes, veus de seguida quins dies tenen gent, i entres nom&eacute;s al que t&#39;interessa.
+      </div>
+      <div class="callout warn">
+        Aix&ograve; nom&eacute;s val per a les hores que <strong>encara no t&eacute; ning&uacute;</strong>. Si algu&eacute; ja l&#39;havia reservada, l&#39;app no te la deixa treure per error: has de fer servir <strong>Alliberar</strong>, a la llista de reserves, que a m&eacute;s treu la reuni&oacute; del teu calendari. I recorda que <strong>aquella persona no rep cap av&iacute;s</strong>: avisa-l&#39;en tu.
+      </div>
+
+      <h3 id="reunions-enllac">Enviar l&#39;enlla&ccedil;</h3>
+      <p>A la fitxa del calendari hi tens l&#39;enlla&ccedil; i un bot&oacute; <strong>Copiar</strong>. Enganxa&#39;l al correu que enviis a les fam&iacute;lies.</p>
+      <ul>
+        <li>Qui hi entri veu <strong>nom&eacute;s les hores que et queden lliures</strong>, agrupades per dia.</li>
+        <li>Tria una hora, escriu el <strong>nom, els cognoms i el correu</strong> i confirma.</li>
+        <li>No li cal instal&middot;lar res ni tenir cap compte.</li>
+      </ul>
+      <div class="callout">
+        L&#39;enlla&ccedil; porta un codi llarg a l&#39;atzar: nom&eacute;s hi entra qui el tingui. Aix&ograve; s&iacute;: qui el tingui el pot reenviar, com qualsevol enlla&ccedil;.
+      </div>
+
+      <h3 id="reunions-solapar">Dues fam&iacute;lies no poden agafar la mateixa hora</h3>
+      <p>&Eacute;s el que m&eacute;s s&#39;ha cuidat d&#39;aquesta eina. Quan alg&uacute; reserva:</p>
+      <ul>
+        <li>Aquella hora <strong>desapareix</strong> a l&#39;instant per a tothom.</li>
+        <li>Si dues persones cliquen la mateixa hora al mateix moment, <strong>nom&eacute;s una la fa seva</strong>. A l&#39;altra li surt &laquo;aquesta hora l&#39;acaba d&#39;agafar una altra persona&raquo; i li torna a ensenyar les que queden.</li>
+        <li>Tampoc es pot reservar una hora que <strong>es trepitgi</strong> amb una altra reuni&oacute; ja reservada, ni amb res que tinguis al teu calendari.</li>
+      </ul>
+
+      <h3 id="reunions-afegir">Afegir hores despr&eacute;s</h3>
+      <p>T&#39;ha quedat lliure una estona que no havies ofert? A la fitxa del calendari, <strong>+ Afegir hores</strong>.</p>
+      <ol class="step-list">
+        <li>Posa el <strong>dia</strong> i <strong>de quina hora a quina hora</strong>, i clica <strong>Afegir</strong>.</li>
+        <li>Et diu quantes reunions hi cabran. Pots afegir-hi <strong>diverses estones de dies diferents</strong> abans de desar.</li>
+        <li><strong>Afegir-les</strong> i ja les veuen les fam&iacute;lies.</li>
+      </ol>
+      <p>Es parteixen amb la <strong>mateixa durada i descans</strong> que ja t&eacute; aquell calendari. Les que xoquin amb el teu Google Calendar, o amb hores que ja hi havia, no s&#39;afegeixen i t&#39;ho diu.</p>
+
+      <h3 id="reunions-missatge">El missatge que veuen en confirmar</h3>
+      <p>Just despr&eacute;s de triar l&#39;hora, la persona llegeix un missatge. Per defecte diu que ja est&agrave; apuntat i que respongui el correu si no hi pot venir.</p>
+      <p>Si vols dir-hi alguna cosa m&eacute;s &mdash;per on entrar, qu&egrave; portar, on aparcar&mdash; posa-hi el teu: hi ha el camp <strong>&laquo;Missatge en confirmar l&#39;hora&raquo;</strong> quan crees el calendari, i el bot&oacute; <strong>Missatge de confirmaci&oacute;</strong> a la fitxa per canviar-lo <strong>quan vulguis, tamb&eacute; despr&eacute;s d&#39;enviar l&#39;enlla&ccedil;</strong>.</p>
+      <div class="callout tip">
+        <strong>Si el deixes buit, hi surt el de sempre.</strong> No has de posar-hi res si no et fa falta. I si te n&#39;has cansat, esborra&#39;l i torna al de sempre.
+      </div>
+
+      <h3 id="reunions-gestionar">Veure i gestionar les reserves</h3>
+      <p>En obrir l&#39;eina hi tens tots els teus calendaris, amb quantes hores queden lliures i qui ha reservat qu&egrave;. Els que ja han passat queden al final i m&eacute;s apagats.</p>
+      <div class="callout">
+        Les entrevistes <strong>que ja s'han fet</strong> continuen a la llista, apagades i amb «ja ha passat», i es compten a part («2 ja fetes»). Abans desapareixien de la llista però seguien sumant al número de reservades, i no quadrava.
+      </div>
+      <ul>
+        <li><strong>Tancar reserves:</strong> deixa de deixar reservar sense esborrar res. Les hores ja reservades es queden.</li>
+        <li><strong>Alliberar</strong> una hora: la treu del teu calendari i qualsevol la podr&agrave; tornar a agafar. <strong>La persona no rep cap av&iacute;s</strong>: si cal, avisa-l&#39;en tu.</li>
+        <li><strong>Esborrar</strong> el calendari sencer: l&#39;enlla&ccedil; deixa de funcionar i les reunions reservades tamb&eacute; s&#39;esborren del teu Google Calendar. T&#39;avisa de quantes s&oacute;n abans de fer-ho.</li>
+      </ul>
+      <div class="callout warn">
+        <strong>Si un dia el servidor no respon</strong>, aquesta pantalla t'ho diu clarament i et deixa un botó per tornar-ho a provar. El que <strong>no</strong> ha de fer és dir-te que no tens cap convocatòria: les que tinguis obertes hi continuen i les famílies hi poden reservar igual. <strong>No en creïs una de nova</strong> aquell dia, o tindries dos enllaços diferents donant voltes.
+      </div>
+      <div class="callout warn">
+        Si alguna reserva et surt amb <strong>&laquo;No s&#39;ha pogut posar al Google Calendar&raquo;</strong>, l&#39;hora est&agrave; guardada i ning&uacute; m&eacute;s la pot agafar, per&ograve; no t&eacute;nse&#39;l a l&#39;agenda. Clica <strong>Tornar-ho a provar</strong>. Es fa aix&iacute; a posta: val m&eacute;s una hora bloquejada que dues fam&iacute;lies a la mateixa hora.
+      </div>
+    </section>
+
+    <!-- 19. VEDRUNU -->
+    <section id="vedrunu">
+      <h2>21. Vedrunu, l'assistent</h2>
+      <p>En <strong>Vedrunu</strong> és l'assistent de l'aula. El tens sempre a baix a la dreta; clica-hi per obrir-lo.</p>
+      <p>Li pots preguntar de tot amb les teves paraules:</p>
+      <ul>
+        <li><strong>Dubtes de l'app:</strong> «com funciona el generador de comentaris?», «on poso els festius?».</li>
+        <li><strong>Dades teves:</strong> «quantes tasques pendents tinc?», «quants alumnes tinc a classe?», «com va la Marta a Matemàtiques?».</li>
+        <li><strong>Fer coses:</strong> «apunta'm que dilluns he de trucar a la família d'en Joan», «posa'm una reunió el 12 a les 5».</li>
+      </ul>
+      <div class="callout">
+        Quan li demanes de <strong>crear una tasca o un event</strong>, no ho fa directament: et mostra una fitxa amb el que ha entès i tu <strong>confirmes o cancel·les</strong>. Mai no et posarà res que tu no hagis validat.
+      </div>
+      <p>Recorda el fil de la conversa, així que li pots anar precisant les coses sense repetir-ho tot. Si el tanques i el tornes a obrir, comença de nou.</p>
+    </section>
+
+    <!-- 20. PERSONALITZAR -->
+    <section id="personalitzar">
+      <h2>22. Personalitzar l'app</h2>
+      <p>Aquest apartat és el resum de <strong>què pots canviar i on ho trobes</strong>. Res d'això és fix ni ve imposat: cada mestra ho té a la seva manera.</p>
+      <table>
+        <tr><th>Què vull canviar</th><th>On es fa</th></tr>
+        <tr><td>Les meves assignatures i grups</td><td>Menú lateral → <strong>el meu nom</strong> (perfil)</td></tr>
+        <tr><td>El meu horari, sense escriure’l casella per casella</td><td>Horari → <strong>Omplir-lo amb el PDF</strong>, i adjunta el PDF dels horaris de l’escola</td></tr>
+        <tr><td>A quins grups faig classe (especialistes)</td><td>Menú lateral → <strong>el meu nom</strong> → <strong>A quins grups fas classe?</strong></td></tr>
+        <tr><td>De quina classe vull veure el registre d’aula (especialistes)</td><td>Registres d’aula → desplegable <strong>Assignatura i grup</strong>, a dalt de tot</td></tr>
+        <tr><td>Quin grup vull mirar i modificar (direcció)</td><td><strong>Alumnes</strong> → a dalt, tria el <strong>curs</strong> i la <strong>línia</strong></td></tr>
+        <tr><td>El meu horari setmanal</td><td>Menú → <strong>Horari</strong></td></tr>
+        <tr><td>Els objectius d'avaluació i els seus criteris</td><td>Generador de comentaris → <strong>Editar objectius</strong></td></tr>
+        <tr><td>Importar els objectius d'un document</td><td>Editar objectius → <strong>Importar d'un document</strong></td></tr>
+        <tr><td>Com vull que sonin els meus comentaris</td><td>Generador de comentaris → <strong>La meva manera d'escriure</strong></td></tr>
+        <tr><td>Els aspectes d'actitud</td><td>Configuració → <strong>Aspectes d'actitud</strong></td></tr>
+        <tr><td>Els enllaços de ClassDojo i Coordinació</td><td>Configuració → <strong>Els meus enllaços</strong></td></tr>
+        <tr><td>Les categories i els colors del calendari</td><td>Calendari mensual → <strong>⚙ Categories</strong></td></tr>
+        <tr><td>Enviar events i tasques al meu Google</td><td>Configuració → <strong>Escriure al meu Google</strong></td></tr>
+        <tr><td>Convocar una reunió i enviar l enllaç</td><td>Eines → <strong>Convocar reunions</strong></td></tr>
+        <tr><td>Les notificacions del matí</td><td>Configuració → <strong>Notificacions</strong></td></tr>
+      </table>
+      <div class="callout">
+        Tot això es desa <strong>al teu full de càlcul</strong>, no al navegador. Ho configures un cop i ho tens igual a tots els teus dispositius.
+      </div>
+    </section>
+
+    <!-- 21. NOTIFICACIONS -->
+    <section id="notificacions">
+      <h2>23. Notificacions</h2>
+      <p>L'app pot enviar-te una notificació cada matí a les <strong>7:00</strong> amb tot el que has de tenir en compte aquell dia: tasques que vencen, alertes del planning, activitats especials, notes del dia i events del calendari.</p>
+      <ol class="step-list">
+        <li>Ves a Configuració → secció <strong>Notificacions</strong>.</li>
+        <li>Clica <strong>Activar</strong> i accepta el permís del navegador.</li>
+        <li>Clica <strong>Provar</strong> per veure'n una immediatament.</li>
+      </ol>
+      <div class="callout warn">
+        <strong>Limitacions:</strong> funciona a Chrome (Android i escriptori). No funciona a Safari/iPhone. A l'escriptori, Chrome ha d'haver estat obert algun moment del matí perquè la notificació salti.
+      </div>
+    </section>
+
+    <!-- 22. SYNC -->
+    <section id="sync">
+      <h2>24. Sincronització i versions</h2>
+      <p>L'indicador de sincronització (al peu del menú) et diu l'estat: <strong>groc</strong> mentre carrega, <strong>verd</strong> quan està al dia, <strong>vermell</strong> si no hi ha connexió.</p>
+      <h3>Com funciona</h3>
+      <ul>
+        <li><strong>Càrrega instantània:</strong> quan obres l'app la veus plena de seguida amb les dades de l'última sessió, mentre les fresques es carreguen en segon pla.</li>
+        <li><strong>Actualització automàtica:</strong> tots els apartats es refresquen sols en segon pla cada pocs minuts i quan tornes a l'app, sense haver d'entrar a cada pàgina.</li>
+        <li><strong>Reintent automàtic:</strong> si la primera connexió falla perquè el servidor estava adormit, l'app ho reintenta sola.</li>
+        <li><strong>Funciona sense connexió:</strong> pots consultar les últimes dades encara que no tinguis internet.</li>
+      </ul>
+      <div class="callout tip">
+        La primera càrrega del dia pot ser una mica més lenta (el servidor de Google es «desperta»). A partir de la segona, tot va molt ràpid.
+      </div>
+
+      <h3 id="esperar">Quan l'app està carregant</h3>
+      <p>Moltes coses que cliques (canviar de grup, obrir una llista, desar) han d'anar a buscar-ho al Google, i això pot trigar uns segons. Perquè no sembli que el botó no funciona, ara ho veus:</p>
+      <ul>
+        <li><strong>Una ratlla fina a dalt de tot:</strong> l'app està treballant pel seu compte (posant-se al dia, portant el calendari…). <strong>Pots continuar fent el que vulguis.</strong></li>
+        <li><strong>La pantalla s'enfosqueix amb una rodona que gira:</strong> has clicat una cosa i s'està carregant. Dura el que dura i marxa sola. <strong>El text que hi surt diu què està passant de debò</strong> — «Desant…» només quan de veritat s'està desant alguna cosa teva.</li>
+        <li><strong>En obrir l'app</strong> surt la pantalla granada amb el logo de l'escola. Hi és mentre es posa al dia, i <strong>quan desapareix vol dir que ja ho tens tot</strong>. Si algun dia el servidor de Google va molt lent, al cap d'uns segons t'hi surt un botó per <strong>entrar igualment</strong>.</li>
+      </ul>
+      <div class="callout tip">
+        Mentre hi ha la rodona <strong>no es pot clicar res, i és a posta</strong>. Clicar més vegades el mateix botó no ho fa anar més ràpid: fa que l'app hagi de fer la mateixa feina un altre cop i vagi <em>més</em> lenta.
+      </div>
+      <p>Si tornes a un grup que acabes de mirar, ara surt de seguida: l'app se'n recorda durant un minut i no ho torna a demanar.</p>
+
+      <h3>Quan hi ha una versió nova</h3>
+      <p>Quan es publica una millora, en obrir l'app et surt un <strong>avís</strong> que et diu què s'ha actualitzat, amb un botó <strong>«Actualitzar ara»</strong>.</p>
+      <ul>
+        <li>Clica-hi i ja està: es posa al dia sola i es torna a obrir.</li>
+        <li><strong>No perds res.</strong> Les teves dades són al Google Sheets; això només refresca el programa.</li>
+        <li>Si prefereixes fer-ho a mà, la drecera és <code>Ctrl+Shift+R</code> (Windows) o <code>Cmd+Shift+R</code> (Mac).</li>
+      </ul>
+      <div class="callout">
+        Si tanques l'avís, no passa res: l'app continua funcionant. Te'l tornarà a mostrar més endavant.
+      </div>
+    </section>
+
+    <!-- 23. PREGUNTES -->
+    <section id="trucs">
+      <h2>25. Preguntes freqüents</h2>
+
+      <h4>He fet un canvi i no el veig en un altre dispositiu</h4>
+      <p>Les dades es sincronitzen en segon pla. Espera uns segons o torna a entrar a l'app; es refrescarà sol. L'indicador verd et confirma que estàs veient l'última versió.</p>
+
+      <h4>Veig la versió antiga de l'app</h4>
+      <p>Fes <code>Ctrl+Shift+R</code> (Windows) o <code>Cmd+Shift+R</code> (Mac). Si t'ha sortit l'avís de versió nova, encara més fàcil: clica-hi «Actualitzar ara».</p>
+
+      <h4>Qui veu el que escric?</h4>
+      <p>Depèn de què sigui:</p>
+      <ul>
+        <li><strong>Ho veuen les altres mestres del grup:</strong> les dades de la fitxa de l'alumne (família, mèdic, PI/AM, EAP, aspectes específics), les condicions de seient i les <strong>observacions</strong>. És a posta, perquè la informació del nen no es quedi en una sola llibreta.</li>
+        <li><strong>És només teu:</strong> les notes, els assoliments, el planning, l'horari, els post-its, els registres d'aula, els teus objectius i la teva manera d'escriure els comentaris.</li>
+      </ul>
+
+      <h4>No em surt cap alumne</h4>
+      <p>Comprova el teu <a href="#perfil">perfil</a>: has de tenir triat el grup del qual ets tutor/a, o el curs on fas classe. Si el perfil està bé i continua buit, avisa'n en Pol.</p>
+
+      <h4>Al generador de comentaris no hi ha objectius</h4>
+      <p>És normal la primera vegada: els objectius són teus i comencen buits. Clica <strong>Editar objectius</strong> i escriu-los, o millor, <a href="#importar">importa'ls d'un document</a> que ja tinguis.</p>
+
+      <h4>El generador de comentaris em dona error</h4>
+      <p>Si diu que hi ha molta demanda, espera uns segons i torna-ho a provar: vol dir que el servei d'IA està saturat en aquell moment, i l'app ja prova altres vies sola. En ús normal (un comentari per alumne) no hauria de passar. Encara que falli, tens l'esborrany amb totes les idees ordenades per copiar.</p>
+
+      <h4>He posat un event a l'app i no surt al meu Google Calendar</h4>
+      <p>Has d'activar-ho: Configuració → <a href="#google">Escriure al meu Google</a>. I recorda que els festius del calendari escolar no s'hi envien mai.</p>
+
+      <h4>Quines dades es guarden i on</h4>
+      <p>Tota la informació (alumnes, notes, observacions, planning…) es desa al <strong>Google Sheets</strong>, protegit pel compte de Google. Al dispositiu només hi queda la URL de connexió i una còpia temporal per poder-te ensenyar l'app de seguida en obrir-la.</p>
+
+      <div class="callout" style="margin-top:32px">
+        <strong>En resum:</strong> introdueix la informació un sol cop i l'app la connecta tota — un event al calendari surt al planning, a l'inici i al teu Google; un apunt d'una activitat acaba al comentari de l'informe; un assoliment s'acoloreix sol al full de càlcul. Deixa que treballi en segon pla i centra't a ensenyar.
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+/* Cercador de l'índex: filtra els apartats que contenen la paraula.
+   Busca dins el text sencer de cada secció, no només al títol. */
+(function () {
+  var camp = document.getElementById('tocSearch');
+  if (!camp) return;
+  var enllacos = [].slice.call(document.querySelectorAll('.toc a[href^="#"]'));
+  var capRes = document.getElementById('tocCapRes');
+  // Accents: es treuen amb NFD + el rang de marques diacritiques (U+0300–U+036F),
+  // construit amb codis perque el fitxer es pugui reobrir amb qualsevol editor.
+  var MARQUES = new RegExp('[' + String.fromCharCode(0x300) + '-' + String.fromCharCode(0x36f) + ']', 'g');
+
+  /* Un apartat gran (una secció sencera) busca dins tot el seu text.
+     Un subapartat (un h3 amb id) busca només dins el SEU tros: del seu
+     títol fins al següent h3. Si no, buscant "actitud" et sortiria també
+     "Carpeta Viatgera", que és de la mateixa secció però no en parla. */
+  var textos = enllacos.map(function (a) {
+    var dest = document.getElementById(a.getAttribute('href').slice(1));
+    var t = a.textContent + ' ';
+    if (dest && dest.tagName === 'SECTION') {
+      t += dest.textContent;
+    } else if (dest) {
+      t += dest.textContent + ' ';
+      var g = dest.nextElementSibling;
+      while (g && g.tagName !== 'H3' && g.tagName !== 'H2') {
+        t += g.textContent + ' ';
+        g = g.nextElementSibling;
+      }
+    }
+    return neteja(t);
+  });
+
+  function neteja(s) {
+    return s.toLowerCase()
+      .normalize('NFD').replace(MARQUES, '')
+      .replace(/[·'’]/g, ' ');
+  }
+
+  function filtra() {
+    var q = neteja(camp.value.trim());
+    if (!q) {
+      enllacos.forEach(function (a) { a.classList.remove('oculta'); });
+      capRes.style.display = 'none';
+      return;
+    }
+    var trobats = 0;
+    enllacos.forEach(function (a, i) {
+      var hi = textos[i].indexOf(q) !== -1;
+      a.classList.toggle('oculta', !hi);
+      if (hi) trobats++;
+    });
+    capRes.style.display = trobats ? 'none' : 'block';
+  }
+
+  camp.addEventListener('input', filtra);
+  camp.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { camp.value = ''; filtra(); }
+    if (e.key === 'Enter') {
+      var primer = enllacos.filter(function (a) { return !a.classList.contains('oculta'); })[0];
+      if (primer) primer.click();
+    }
+  });
+})();
+</script>
+</body>
+</html>
