@@ -2,6 +2,7 @@
   "mestra": "Aida Riera",
   "mareVersio": "v251",
   "propis": [
+    "manual.html",
     "manifest.webmanifest",
     "manifest.json"
   ],
