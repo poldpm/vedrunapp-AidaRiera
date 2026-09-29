@@ -22,11 +22,22 @@
    El codi d'aquestes eines arriba a totes les apps amb el sync, però
    neix apagat: cada mestra només veu les que ha demanat. Aquí és on
    s'encenen les seves.
-   ============================================================ */
 
-// Rúbriques d'avaluació: menú → «Rúbriques d'avaluació». Avalua una
-// activitat amb els seus criteris i passa la nota al registre de notes.
-window.EINES_RUBAVAL = true;
+   ARA MATEIX NO EN TÉ CAP D'ENCESA, i és a posta.
+
+   ⚠ Les RÚBRIQUES D'AVALUACIÓ es van encendre el 29/9/2026 i es van tornar
+   a apagar el mateix dia. En Pol: «jo vull que la tingui com a actualització
+   disponible, no com a eina ja instal·lada». O sigui que la vegi a
+   «Possibles actualitzacions», la llegeixi i la demani ella si li fa
+   servei, com qualsevol altra mestra. Encendre-la per endavant se salta
+   justament el pas que fa que el catàleg serveixi de res.
+
+   Per encendre-la el dia que la demani, n'hi ha prou amb treure el comentari
+   d'aquesta línia (i res més: la resta ja està feta i provada, inclòs com
+   conviu amb el registre per categories d'aquí sota).
+
+       // window.EINES_RUBAVAL = true;
+   ============================================================ */
 
 /* ============================================================
    EL REGISTRE DE NOTES PER CATEGORIES
