@@ -73,8 +73,11 @@ window.EINES_RUBAVAL = true;
     _memoria[clau] = dades;
     try { localStorage.setItem('aidacats_' + clau, JSON.stringify(dades)); } catch (e) {}
   }
-  function _dades() {
-    var k = _clauActual();
+  /* Amb `clau` es demanen les categories d'UNA ALTRA assignatura, no de la
+     que hi ha oberta. Cal per al quadre de les rúbriques: quan s'obre, el
+     registre de notes encara no s'ha obert i `notesContext` no diu res. */
+  function _dades(clau) {
+    var k = clau || _clauActual();
     if (!k) return { cats: [], actitudCat: '' };
     if (!_memoria[k]) {
       try {
@@ -86,8 +89,8 @@ window.EINES_RUBAVAL = true;
     if (!d || !Array.isArray(d.cats)) return { cats: [], actitudCat: '' };
     return d;
   }
-  function _cats()  { return _dades().cats; }
-  function _actiu() { return _cats().length > 0; }
+  function _cats(clau)  { return _dades(clau).cats; }
+  function _actiu(clau) { return _cats(clau).length > 0; }
 
   // De quina categoria és una activitat. L'actitud no és una columna com les
   // altres (la puntuació viu al navegador) i per això va a part.
@@ -96,8 +99,8 @@ window.EINES_RUBAVAL = true;
     if (item.id === 'actitud_ref') return _dades().actitudCat || '';
     return item.cat || '';
   }
-  function _catPerId(id) {
-    var c = _cats();
+  function _catPerId(id, clau) {
+    var c = _cats(clau);
     for (var i = 0; i < c.length; i++) if (c[i].id === id) return c[i];
     return null;
   }
@@ -389,35 +392,41 @@ window.EINES_RUBAVAL = true;
      el mateix que ja és a la taula, o sigui que amb repintar n'hi ha prou. */
   /* D'on surt la categoria d'una columna que acaba de néixer:
        1. el selector del quadre de «Nou ítem», si el quadre és obert;
-       2. l'última que va fer servir en aquesta assignatura;
-       3. la primera de la llista.
-     El 2 i el 3 són per a les columnes que NO neixen del quadre —les que
-     crea l'eina de rúbriques en passar la nota al registre—: si no,
-     s'haurien quedat amb el que hi hagués quedat al selector de l'última
-     vegada, que no vol dir res. */
-  function _ultimaCatClau() { return 'aidaultimacat_' + (_clauActual() || ''); }
-  function _recordaCat(id) { try { localStorage.setItem(_ultimaCatClau(), id); } catch (e) {} }
-  function _catPerDefecte() {
+       2. el selector que aquest fitxer afegeix al quadre de «Passar les
+          notes al registre» de les rúbriques (veure l'apartat 6 bis);
+       3. l'última que va fer servir en aquesta assignatura;
+       4. la primera de la llista.
+     L'1 i el 2 són el que tria ella. El 3 i el 4 són la xarxa de sota, per
+     si mai naixia una columna per un camí que encara no existeix: val més
+     posar-la en una categoria i dir-li-ho que no pas deixar-la fora de la
+     nota sense que ho sàpiga. */
+  function _ultimaCatClau(clau) { return 'aidaultimacat_' + (clau || _clauActual() || ''); }
+  function _recordaCat(id, clau) { try { localStorage.setItem(_ultimaCatClau(clau), id); } catch (e) {} }
+  function _catPerDefecte(clau) {
     var ultima = null;
-    try { ultima = localStorage.getItem(_ultimaCatClau()); } catch (e) {}
-    if (ultima && _catPerId(ultima)) return ultima;
-    return _cats()[0] ? _cats()[0].id : '';
+    try { ultima = localStorage.getItem(_ultimaCatClau(clau)); } catch (e) {}
+    if (ultima && _catPerId(ultima, clau)) return ultima;
+    return _cats(clau)[0] ? _cats(clau)[0].id : '';
   }
+
+  var _catRubricaTriada = null;   // el que ha dit al quadre de la rúbrica
 
   var _posaOrig = window._casellesPosa;
   window._casellesPosa = function (tipus, ctx, clau, canvi) {
     if (tipus === 'notesItem' && _actiu() && canvi && canvi.item && !canvi.item.cat) {
       var quadreObert = !!document.querySelector('#newNotaOverlay.open');
       var sel = document.getElementById('aidaNotaCat');
-      var tria = (quadreObert && sel && sel.value) ? sel.value : _catPerDefecte();
-      if (quadreObert && tria) _recordaCat(tria);
-      /* ⚠ UNA COLUMNA QUE VE D'UNA RÚBRICA NO PASSA PEL QUADRE.
-         L'eina de rúbriques crea la columna ella sola en passar la nota al
-         registre (`notesCreaItem`), sense obrir res. Com que aquí les
-         categories manen, se li'n posa una i se li DIU quina: una columna
-         que es quedés sense categoria no comptaria per a la nota i no hi
-         hauria res a la pantalla que ho expliqués. */
-      if (tria && !quadreObert) {
+      var tria = '', triada = false;
+      if (quadreObert && sel && sel.value) { tria = sel.value; triada = true; }
+      else if (_catRubricaTriada && _catPerId(_catRubricaTriada)) { tria = _catRubricaTriada; triada = true; }
+      else tria = _catPerDefecte();
+      _catRubricaTriada = null;
+      if (triada && tria) _recordaCat(tria);
+      /* Si la columna ha nascut sense que ningú n'hagi triat la categoria,
+         se li'n posa una i se li DIU quina. Una columna sense categoria no
+         comptaria per a la nota i no hi hauria res a la pantalla que ho
+         expliqués. */
+      if (tria && !triada) {
         var c = _catPerId(tria);
         if (c && typeof showToast === 'function') {
           setTimeout(function () {
@@ -439,6 +448,127 @@ window.EINES_RUBAVAL = true;
     }
     return _posaOrig.apply(this, arguments);
   };
+
+  /* ---------- 6 bis. Triar la categoria en passar una rúbrica al registre ----------
+
+     L'eina de rúbriques crea la columna del registre ella sola, sense passar
+     pel quadre de «Nou ítem». Aquí les categories manen, o sigui que ha de
+     poder dir a quina va, i el lloc on toca és el mateix quadre on ja diu
+     quant compta l'activitat.
+
+     Aquell quadre és del base (`#ravPassaOverlay`) i no es toca: el camp s'hi
+     afegeix quan s'obre, que és quan el base ja n'ha repintat el cos. Si un
+     dia el quadre canvia, això deixa de posar-hi el camp i prou: la columna
+     seguirà anant a una categoria (l'última que hagi fet servir) i un avís
+     li dirà a quina. No es pot quedar sense. */
+
+  /* De quina assignatura, trimestre i grup és la rúbrica que s'està passant.
+     NO es pot mirar `notesContext`: el registre encara no s'ha obert (l'obre
+     l'eina després, ella mateixa). Se sap del selector de la pàgina de
+     rúbriques i del trimestre que hi tingui marcat, que és exactament el que
+     l'eina li passarà a `openNotes`. */
+  function _clauDeLaRubrica() {
+    var sel = document.getElementById('rubavalAssig');
+    if (!sel || !sel.value) return null;
+    var b = document.querySelector('#rubavalPicker .trim-sel-btn.active');
+    var trim = (b && b.dataset && b.dataset.trim) ? b.dataset.trim : '';
+    if (!trim) return null;
+    var e = null;
+    if (typeof _perfilEntradesAmbGrup === 'function') {
+      e = _perfilEntradesAmbGrup().filter(function (x) { return x.key === sel.value; })[0];
+    }
+    if (!e) return null;
+    return _clau(e.key, trim, e.grup || null);
+  }
+
+  function _posaTriaCatRubrica() {
+    var ov = document.getElementById('ravPassaOverlay');
+    if (!ov || !ov.classList.contains('open')) return;
+    var cos = document.getElementById('ravPassaBody');
+    if (!cos) return;
+
+    // El cos es repinta a cada obertura: el camp d'abans ja no hi és o sobra.
+    var vell = document.getElementById('aidaPassaCamp');
+    if (vell && vell.parentNode) vell.parentNode.removeChild(vell);
+    _catRubricaTriada = null;
+
+    /* Si d'aquella assignatura no se'n saben les categories (encara no l'ha
+       oberta mai en aquest navegador), no s'inventa cap desplegable: la
+       columna anirà a la primera i un avís li dirà a quina. */
+    var clau = _clauDeLaRubrica();
+    if (!clau || !_actiu(clau)) return;
+
+    /* La columna ja existeix quan el pes surt bloquejat: llavors no se'n crea
+       cap de nova i la categoria que tingui no es toca. Val més dir-ho que no
+       pas ensenyar-li un desplegable que no faria res. */
+    var pes = document.getElementById('ravPassaPes');
+    var jaHiEra = !!(pes && pes.disabled);
+
+    var camp = document.createElement(jaHiEra ? 'p' : 'label');
+    camp.id = 'aidaPassaCamp';
+    if (jaHiEra) {
+      camp.className = 'modal-hint';
+      camp.style.margin = '-4px 0 12px';
+      camp.textContent = 'La columna ja és al registre: es queda a la categoria que tingui. ' +
+                         'Es canvia des de Categories.';
+    } else {
+      camp.className = 'rav-camp';
+      camp.style.marginBottom = '12px';
+      var perDefecte = _catPerDefecte(clau);
+      camp.innerHTML = '<span class="rav-camp-nom">A quina categoria va</span>' +
+        '<select class="modal-input" id="aidaPassaCat" aria-label="A quina categoria va la nota">' +
+        _cats(clau).map(function (c) {
+          return '<option value="' + escapeHtml(c.id) + '"' +
+                 (c.id === perDefecte ? ' selected' : '') + '>' +
+                 escapeHtml(c.nom) + ' · ' + _num(c.pes) + '%</option>';
+        }).join('') + '</select>';
+    }
+
+    /* Just a sota de «Quant compta dins del trimestre». Si el base ja hi ha
+       posat la seva nota al peu («el pes es canvia des del registre»), es va
+       a sota d'aquella: si no, quedaria entre la casella i la seva pròpia
+       explicació. */
+    var ancora = pes ? pes.closest('.rav-camp') : null;
+    if (ancora && ancora.nextElementSibling &&
+        ancora.nextElementSibling.classList.contains('modal-hint')) {
+      ancora = ancora.nextElementSibling;
+    }
+    if (ancora && ancora.parentNode === cos) {
+      if (ancora.nextSibling) cos.insertBefore(camp, ancora.nextSibling);
+      else cos.appendChild(camp);
+    } else {
+      cos.insertBefore(camp, cos.firstChild);
+    }
+  }
+
+  /* El que tria es recull al botó de «Passar-hi les notes», i des de
+     l'OVERLAY: així s'executa abans que el `onclick` del base, que és qui
+     tanca el quadre i engega tot el procés. */
+  function _escoltaQuadreRubrica(ov) {
+    if (!ov || ov._aidaEscoltat) return;
+    ov._aidaEscoltat = true;
+    ov.addEventListener('click', function (ev) {
+      var fes = ev.target && ev.target.closest ? ev.target.closest('#ravPassaFes') : null;
+      if (!fes) return;
+      var sel = document.getElementById('aidaPassaCat');
+      _catRubricaTriada = (sel && sel.value) ? sel.value : null;
+    }, true);
+    new MutationObserver(function () { _posaTriaCatRubrica(); })
+      .observe(ov, { attributes: true, attributeFilter: ['class'] });
+    _posaTriaCatRubrica();
+  }
+
+  function _vigilaQuadreRubrica() {
+    var ov = document.getElementById('ravPassaOverlay');
+    if (ov) { _escoltaQuadreRubrica(ov); return; }
+    // Encara no existeix: el base el fabrica el primer cop que s'obre.
+    new MutationObserver(function (_, obs) {
+      var o = document.getElementById('ravPassaOverlay');
+      if (!o) return;
+      obs.disconnect();
+      _escoltaQuadreRubrica(o);
+    }).observe(document.body, { childList: true });
+  }
 
   /* ---------- 6. El quadre de les categories ---------- */
 
@@ -748,7 +878,7 @@ window.EINES_RUBAVAL = true;
     document.head.appendChild(s);
   }
 
-  function _arrenca() { _posaEstils(); _posaBoto(); }
+  function _arrenca() { _posaEstils(); _posaBoto(); _vigilaQuadreRubrica(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _arrenca);
   else _arrenca();
 })();
