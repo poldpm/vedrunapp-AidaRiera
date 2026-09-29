@@ -17,6 +17,18 @@
    ============================================================ */
 
 /* ============================================================
+   EINES ENCESES PER A ELLA
+   ------------------------------------------------------------
+   El codi d'aquestes eines arriba a totes les apps amb el sync, però
+   neix apagat: cada mestra només veu les que ha demanat. Aquí és on
+   s'encenen les seves.
+   ============================================================ */
+
+// Rúbriques d'avaluació: menú → «Rúbriques d'avaluació». Avalua una
+// activitat amb els seus criteris i passa la nota al registre de notes.
+window.EINES_RUBAVAL = true;
+
+/* ============================================================
    EL REGISTRE DE NOTES PER CATEGORIES
    ------------------------------------------------------------
    L'Aida no puntua amb una llista d'activitats soltes: fa servir el
@@ -375,11 +387,45 @@
      comptes de copiar `addNotaItem` sencer —que deixaria de rebre'n els
      arranjaments— s'hi enganxa la categoria just quan hi passa. L'objecte és
      el mateix que ja és a la taula, o sigui que amb repintar n'hi ha prou. */
+  /* D'on surt la categoria d'una columna que acaba de néixer:
+       1. el selector del quadre de «Nou ítem», si el quadre és obert;
+       2. l'última que va fer servir en aquesta assignatura;
+       3. la primera de la llista.
+     El 2 i el 3 són per a les columnes que NO neixen del quadre —les que
+     crea l'eina de rúbriques en passar la nota al registre—: si no,
+     s'haurien quedat amb el que hi hagués quedat al selector de l'última
+     vegada, que no vol dir res. */
+  function _ultimaCatClau() { return 'aidaultimacat_' + (_clauActual() || ''); }
+  function _recordaCat(id) { try { localStorage.setItem(_ultimaCatClau(), id); } catch (e) {} }
+  function _catPerDefecte() {
+    var ultima = null;
+    try { ultima = localStorage.getItem(_ultimaCatClau()); } catch (e) {}
+    if (ultima && _catPerId(ultima)) return ultima;
+    return _cats()[0] ? _cats()[0].id : '';
+  }
+
   var _posaOrig = window._casellesPosa;
   window._casellesPosa = function (tipus, ctx, clau, canvi) {
     if (tipus === 'notesItem' && _actiu() && canvi && canvi.item && !canvi.item.cat) {
+      var quadreObert = !!document.querySelector('#newNotaOverlay.open');
       var sel = document.getElementById('aidaNotaCat');
-      var tria = sel && sel.value ? sel.value : (_cats()[0] ? _cats()[0].id : '');
+      var tria = (quadreObert && sel && sel.value) ? sel.value : _catPerDefecte();
+      if (quadreObert && tria) _recordaCat(tria);
+      /* ⚠ UNA COLUMNA QUE VE D'UNA RÚBRICA NO PASSA PEL QUADRE.
+         L'eina de rúbriques crea la columna ella sola en passar la nota al
+         registre (`notesCreaItem`), sense obrir res. Com que aquí les
+         categories manen, se li'n posa una i se li DIU quina: una columna
+         que es quedés sense categoria no comptaria per a la nota i no hi
+         hauria res a la pantalla que ho expliqués. */
+      if (tria && !quadreObert) {
+        var c = _catPerId(tria);
+        if (c && typeof showToast === 'function') {
+          setTimeout(function () {
+            showToast('«' + canvi.item.nom + '» ha anat a la categoria «' + c.nom +
+                      '». Canvia-la des de Categories si no toca.', 'info');
+          }, 900);
+        }
+      }
       /* ⚠ LA COLUMNA NOVA QUEDAVA FORA DEL SEU BLOC (provat el 29/9/2026).
          El base ordena les columnes ABANS que aquí se sàpiga de quina
          categoria és, i la nova anava a parar al final de tot: a la fila de
