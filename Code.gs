@@ -3329,6 +3329,64 @@ function _matchAlumne(nomDesdob, alumnesTokens) {
   return best;
 }
 
+/* ⚠ DOS NOMS DEL DESDOBLAMENT NO PODEN SER EL MATEIX NEN (7/10/2026).
+
+   «Em falten nens que haurien d'estar al grup.» `_matchAlumne` casa cada
+   nom del full de desdoblaments pel seu compte, i quan dos noms s'assemblen
+   al mateix alumne (dues «Júlia», «Pol» i «Pol M.») tots dos el triaven a
+   ell: el nen sortia un cop i l'altre no sortia enlloc.
+
+   Aquí es puntuen TOTES les parelles nom ↔ alumne amb la mateixa regla, i
+   es reparteixen de la més segura a la menys: cada alumne només es pot
+   donar un cop i cada nom només un alumne. El que no troba parella va a
+   `noTrobats`, i el navegador ho diu a la mestra en lloc de callar-ho. */
+function _puntuaMatch(td, at) {
+  var score = 0, comuns = 0, totsHi = true;
+  for (var j = 0; j < td.length; j++) {
+    var t = td[j];
+    if (at.indexOf(t) !== -1) { comuns++; score += 5; }
+    else if (t.length === 1) {
+      var trob = false;
+      for (var m = 0; m < at.length; m++) { if (at[m].charAt(0) === t) { score += 3; trob = true; break; } }
+      if (!trob) totsHi = false;
+    } else { totsHi = false; }
+  }
+  if (comuns === 0) return 0;
+  if (totsHi) score += 10;
+  // Desempat: com més s'assembla la llargada del nom, més segur
+  return score - Math.abs(at.length - td.length) * 0.1;
+}
+
+function _tokensSensePunts(s) {
+  // «Pol M.» → ['pol','m']: amb el punt, la inicial no es reconeixia com a inicial
+  return _tokens(s).map(function (t) { return t.replace(/\./g, ''); }).filter(function (t) { return t; });
+}
+
+function _casaNomsUnics(noms, alumnesTokens) {
+  var parelles = [];
+  for (var n = 0; n < noms.length; n++) {
+    var td = _tokensSensePunts(noms[n]);
+    if (!td.length) continue;
+    for (var i = 0; i < alumnesTokens.length; i++) {
+      var sc = _puntuaMatch(td, alumnesTokens[i].tokens);
+      if (sc > 0) parelles.push({ n: n, i: i, sc: sc });
+    }
+  }
+  parelles.sort(function (a, b) { return (b.sc - a.sc) || (a.n - b.n) || (a.i - b.i); });
+  var nomFet = {}, alumneFet = {}, perNom = {};
+  parelles.forEach(function (p) {
+    if (nomFet[p.n] || alumneFet[p.i]) return;
+    nomFet[p.n] = true; alumneFet[p.i] = true;
+    perNom[p.n] = alumnesTokens[p.i].ref;
+  });
+  var alumnes = [], noTrobats = [];
+  for (var k = 0; k < noms.length; k++) {
+    if (perNom[k]) alumnes.push(perNom[k]);
+    else if (_tokensSensePunts(noms[k]).length) noTrobats.push(noms[k]);
+  }
+  return { alumnes: alumnes, noTrobats: noTrobats };
+}
+
 // Mapa curs → pestanya de desdoblaments
 function _desdobTabName(curs) {
   // curs: '2n' → 'Desdoblaments 2n (26-27)'
@@ -3340,14 +3398,21 @@ function _desdobTabName(curs) {
 // Retorna { ok, alumnes:[...], bloc, trobat }.
 function getDesdoblament(ss, curs, linia, assignatura) {
   // Cache de 6h (el desdoblament no canvia sovint). Clau per curs+linia+assignatura.
-  var cacheKey = 'desdob_' + curs + '_' + linia + '_' + assignatura;
+  /* «desdob2_»: la clau canvia perquè les respostes guardades d'abans
+     (amb nens repetits i nens que faltaven) no se serveixin més.
+     Una hora i no sis: si secretaria mou un nen de grup, que arribi avui.
+     I NO es guarda una resposta de «no trobo el full»: si era un mal moment
+     de Google, durant hores la mestra hauria vist la classe sencera. */
+  var cacheKey = 'desdob2_' + curs + '_' + linia + '_' + assignatura;
   try {
     var cached = CacheService.getScriptCache().get(cacheKey);
     if (cached) return JSON.parse(cached);
   } catch(e) {}
 
   var res = _getDesdoblamentRaw(ss, curs, linia, assignatura);
-  try { CacheService.getScriptCache().put(cacheKey, JSON.stringify(res), 21600); } catch(e) {}
+  if (res && res.existeix !== false) {
+    try { CacheService.getScriptCache().put(cacheKey, JSON.stringify(res), 3600); } catch(e) {}
+  }
   return res;
 }
 
@@ -3417,12 +3482,8 @@ function _getDesdoblamentRaw(ss, curs, linia, assignatura) {
     return { ref:a, tokens:_tokens(a.nom) };
   });
 
-  var resultat = [], noTrobats = [];
-  nomsQueden.forEach(function(nom){
-    var m = _matchAlumne(nom, alumnesTokens);
-    if (m) resultat.push(m);
-    else noTrobats.push(nom);
-  });
+  var casats = _casaNomsUnics(nomsQueden, alumnesTokens);
+  var resultat = casats.alumnes, noTrobats = casats.noTrobats;
 
   return {
     ok:true, existeix:true, bloc:blocTitol,
@@ -5875,7 +5936,7 @@ function getOrCreateDataSheet(ss, nom) {
    enganxar el Code.gs nou NO n'hi ha prou, cal desplegar-ne una versió
    nova, i fins llavors tot es veu malament sense que ningú ho digui.
    ⚠ Puja-la al mateix temps que la del sw.js/versio.js/versio.json. */
-var BACKEND_VERSIO = 'v261';
+var BACKEND_VERSIO = 'v264';
 
 var MAX_CELA = 45000;
 
