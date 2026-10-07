@@ -1,8 +1,9 @@
 {
-  "versio": "v267",
+  "versio": "v269",
   "data": "2026-10-07",
   "titol": "Novetats d aquesta versió",
   "canvis": [
-    "A les notes de cada assignatura, al costat del nom de l’alumne hi surten les etiquetes PI i AM, com a la pàgina d’Alumnes. Passant-hi el ratolí per sobre et diu de quines àrees és."
+    "Ni l'app ni el manual no porten escrit enlloc el nom de cap alumne: on hi havia exemples amb noms de criatures de l'escola, ara hi ha noms inventats. Les dades de debò només són al full de càlcul, com sempre.",
+    "El manual ja no parla de la «Carpeta Viatgera»: és una cosa que de moment només fa servir una mestra, i explicar-la et feia buscar una cosa que no tens. Si la tens al teu perfil o al teu full de càlcul, segueix funcionant igual."
   ]
 }

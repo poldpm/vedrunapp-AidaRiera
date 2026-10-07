@@ -221,7 +221,6 @@
     <a href="#coment-activitat" class="sub">Comentari per activitat</a>
     <a href="#notes-compartir" class="sub">Compartir amb el tutor</a>
     <a href="#actitud" class="sub">Actitud</a>
-    <a href="#carpeta" class="sub">Carpeta Viatgera</a>
     <a href="#assoliments">14. Assoliments</a>
     <a href="#registres">15. Registres d'aula</a>
     <a href="#grups">16. Generador de grups</a>
@@ -314,7 +313,7 @@
       </div>
 
       <h3 id="config-dubtes">Alumnes amb dades que no acaben de sortir</h3>
-      <p>Al document de fitxes de grup, molts alumnes hi surten <strong>pel nom de pila</strong>. Quan al grup n&#39;hi ha <strong>dos que es diuen igual</strong> —dues Arlet, dos Kai, dues Gales— l&#39;app <strong>no n&#39;endevina cap</strong>, i les dades d&#39;aquell alumne es queden sense posar.</p>
+      <p>Al document de fitxes de grup, molts alumnes hi surten <strong>pel nom de pila</strong>. Quan al grup n&#39;hi ha <strong>dos que es diuen igual</strong> —dues nenes amb el mateix nom de pila, o dos nens— l&#39;app <strong>no n&#39;endevina cap</strong>, i les dades d&#39;aquell alumne es queden sense posar.</p>
       <div class="callout tip">
         <strong>&Eacute;s a posta.</strong> Val m&eacute;s que falti un PI que no pas que surti a la fitxa del nen equivocat: un PI que falta, es veu; un PI mal posat, no el va a comprovar ning&uacute;.
       </div>
@@ -679,7 +678,7 @@
       </div>
 
       <h3>Afegir un alumne</h3>
-      <p>Obre el panell de gestió i clica <strong>Afegir</strong>. Has d'indicar el nom i el <strong>gènere</strong>, que serveix perquè el generador de comentaris faci servir l'article correcte («en Bruno», «la Laura», «l'Aitana»).</p>
+      <p>Obre el panell de gestió i clica <strong>Afegir</strong>. Has d'indicar el nom i el <strong>gènere</strong>, que serveix perquè el generador de comentaris faci servir l'article correcte («en Bruno», «la Laura», «l'Estel»).</p>
 
       <h3 id="contactes">Els contactes de la família</h3>
       <p>El <strong>tutor/a 1</strong>, el <strong>tutor/a 2</strong>, els seus correus i els <strong>telèfons</strong> surten del full <strong>Dades de contacte alumnes</strong> de secretaria, i s'actualitzen sols: l'app se'l mira cada quart d'hora i, si hi ha canviat res, ho passa a les fitxes.</p>
@@ -1047,9 +1046,6 @@
       <div class="callout">
         <strong>Els aspectes els tries tu.</strong> Per defecte són Participació, Atenció, Comportament, Saber estar i Realització d'activitats, però a <strong>Configuració → Aspectes d'actitud</strong> els pots reanomenar, treure'n o afegir-ne els que vulguis. No cal que en siguin cinc.
       </div>
-
-      <h3 id="carpeta">Carpeta Viatgera</h3>
-      <p>Algunes assignatures tenen la columna especial de <strong>Carpeta Viatgera</strong>, un ítem amb el seu propi pes que s'integra al càlcul de la nota final i que va sempre al final de la graella.</p>
 
       <div class="callout tip">
         Totes les graelles del Google Sheets es formaten soles: capçaleres en granat, tot centrat, i les columnes de mitjana i nota amb fons gris clar per indicar que es calculen automàticament.
@@ -1568,8 +1564,8 @@
 
   /* Un apartat gran (una secció sencera) busca dins tot el seu text.
      Un subapartat (un h3 amb id) busca només dins el SEU tros: del seu
-     títol fins al següent h3. Si no, buscant "actitud" et sortiria també
-     "Carpeta Viatgera", que és de la mateixa secció però no en parla. */
+     títol fins al següent h3. Si no, buscant una paraula sortirien tots
+     els subapartats d'aquella secció, encara que no en parlin. */
   var textos = enllacos.map(function (a) {
     var dest = document.getElementById(a.getAttribute('href').slice(1));
     var t = a.textContent + ' ';
