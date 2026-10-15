@@ -31,3 +31,17 @@ window.APP_TOKEN = 'vedruna-escorial-vic-35d1e8e1bd7c0faafa4e59b5522084c7';
    torna a publicar: no s'ha de tocar cap dels seus aparells.
    ============================================================ */
 window.APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw9VNM65yQHb-P51P819aId1EpAJhGfaMv6Bx0c22JjiLbAIawgO5AkmW7D2n7RfRfw/exec";
+
+/* ============================================================
+   ENTRAR AMB GOOGLE
+   ------------------------------------------------------------
+   Un sol cop a cada aparell, i a partir d'aquí entra sola.
+
+   ⚠ Això sol NO protegeix res: només pinta la pantalla d'entrada.
+   Qui comprova de debò que siguis de l'escola és el servidor, amb
+   la propietat LOGIN_DOMINI de la biblioteca.
+
+   Per apagar-ho a aquesta mestra: esborra aquestes dues línies.
+   ============================================================ */
+window.LOGIN_GOOGLE = "290684261462-o07ktlf7ikrvmvv0pmbli28560dqqmj1.apps.googleusercontent.com";
+window.LOGIN_DOMINI = 'escorialvic.cat';
