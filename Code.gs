@@ -706,6 +706,59 @@ function saveRegistreDocents(ss, items, data, base) {
   return { ok: true, items: items.length, ts: _ts };
 }
 
+/* ============================================================
+   L'HORARI DEL CLAUSTRE
+   ------------------------------------------------------------
+   Qui fa classe a cada hora, de tot el claustre. Surt del PDF
+   d'horaris que passa l'escola, que direcció adjunta un cop
+   (el llegeix el NAVEGADOR, amb js/pdfhorari.js; aquí només
+   s'hi desa el resultat).
+
+   Va al full "Grups" COMPARTIT, com el registre de docents:
+   l'adjunta un director i el veuen tots, sense tornar-ho a fer.
+
+   ⚠ Això és la PLANTILLA del curs, no el dia a dia: no sap res
+   de substitucions ni de sortides. Qui ho llegeixi ho ha de dir.
+
+   ⚠ Qualsevol mestre que obri aquell full de càlcul ho pot
+   llegir. Són els horaris que l'escola ja reparteix a tothom,
+   o sigui que no hi ha res que no sàpiga ja (mateixa nota que
+   al registre de docents).
+   ============================================================ */
+
+var HORCLA_CLAU = 'horari_claustre';
+
+function loadHorariClaustre(ss) {
+  var gss = getGrupsSpreadsheet(ss);
+  if (!gss) return { ok: false, error: 'No s\'ha pogut obrir el full de grups compartit' };
+  var r = _jsonDeCela_(gss, '_AppData', HORCLA_CLAU);
+  /* Si hi ha un horari desat i no es pot llegir, s'ha de DIR: tornar-ho
+     buit faria pensar que encara no se n'ha adjuntat cap, i la primera
+     desada se l'enduria (la mateixa pedra del registre de docents). */
+  if (r.malament) return { ok: false, error: 'L\'horari del claustre que hi ha desat no es pot llegir (' +
+    r.mida + ' caràcters). No n\'adjuntis cap altre fins que en Pol ho hagi mirat.' };
+  var o = (r.hi && r.dades) ? r.dades : null;
+  if (!o) return { ok: true, hi: false, mestres: [] };
+  return { ok: true, hi: true, mestres: o.mestres || [], curs: o.curs || '',
+           actualitzat: o.actualitzat || '', per: o.per || '' };
+}
+
+function saveHorariClaustre(ss, mestres, curs, per) {
+  var gss = getGrupsSpreadsheet(ss);
+  if (!gss) return { ok: false, error: 'No s\'ha pogut obrir el full de grups compartit' };
+  if (typeof mestres === 'string') { try { mestres = JSON.parse(mestres); } catch (e) { mestres = null; } }
+  if (Object.prototype.toString.call(mestres) !== '[object Array]' || !mestres.length) {
+    return { ok: false, error: 'No m\'ha arribat cap horari per desar.' };
+  }
+  sheetSetJSON(gss, '_AppData', HORCLA_CLAU, JSON.stringify({
+    mestres: mestres,
+    curs: curs || '',
+    per: per || '',
+    actualitzat: Utilities.formatDate(new Date(), _gTz_(), 'yyyy-MM-dd HH:mm')
+  }));
+  return { ok: true, mestres: mestres.length };
+}
+
 /* ------------------------------------------------------------
    EL RECORDATORI DEL DILLUNS
    ------------------------------------------------------------
@@ -2294,6 +2347,102 @@ var FULLS_COMPARTITS = {
 function _appToken()  { return _prop('APP_TOKEN'); }
 function _geminiKey() { return _prop('GEMINI_KEY'); }
 
+/* ============================================================
+   ENTRAR AMB GOOGLE — qui truca, i no només amb quina clau
+   ------------------------------------------------------------
+   El token de l'app viatja al navegador de cada mestra: qui el tingui,
+   hi entra. No es pot arreglar amagant-lo —hi va igualment—; s'arregla
+   comprovant QUI truca. Aquí es mira que la credencial de Google que
+   envia l'app sigui de debò i que el correu sigui del domini de
+   l'escola.
+
+   ⚠ NEIX APAGAT, I ÉS A POSTA. Això és la biblioteca: hi són totes les
+   mestres alhora. Si s'encengués des d'aquí, el dia que fallés
+   es quedarien fora totes de cop. S'encén PROJECTE PER PROJECTE,
+   posant dues propietats a les Script Properties de la seva mestra:
+
+     LOGIN_DOMINI     escorialvic.cat
+     LOGIN_CLIENT_ID  <el client de Google de l'app>
+
+   Sense `LOGIN_DOMINI`, tot això no s'executa mai i el servidor es
+   comporta exactament com abans. I per tornar enrere n'hi ha prou amb
+   esborrar aquella propietat: ni tocar codi, ni desplegar res.
+   ============================================================ */
+function _loginDomini()   { return (_prop('LOGIN_DOMINI') || '').trim(); }
+function _loginClientId() { return (_prop('LOGIN_CLIENT_ID') || '').trim(); }
+
+/* Comprova la credencial amb Google i torna de qui és.
+   { ok:true, email:'…' }  o  { ok:false, error:'…' } */
+function _loginComprova(idToken, domini, clientId) {
+  if (!idToken) return { ok:false, error:'Cal entrar amb el compte de l\'escola.' };
+
+  /* La comprovació va a Google i triga. Es guarda una estona per no fer-la a
+     cada clic: la mateixa credencial dura una hora i, mentre duri, el que ha
+     dit Google no canvia. Es guarda la resposta sota una EMPREMTA del token,
+     no el token: al cache hi ha coses que no cal que hi siguin senceres. */
+  var empremta = '';
+  var cache = null;
+  try {
+    empremta = 'login_' + Utilities.base64Encode(
+      Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, idToken)).slice(0, 32);
+    cache = CacheService.getScriptCache();
+    var guardat = cache.get(empremta);
+    if (guardat) return JSON.parse(guardat);
+  } catch (e) { cache = null; }
+
+  var dades = null;
+  try {
+    var r = UrlFetchApp.fetch(
+      'https://oauth2.googleapis.com/tokeninfo?id_token=' + encodeURIComponent(idToken),
+      { muteHttpExceptions: true });
+    if (r.getResponseCode() !== 200) {
+      /* ⚠ Això NO es guarda al cache. Un «no» pot ser perquè la credencial ha
+         caducat fa un segon, i l'app en demanarà una de nova tot seguit: si es
+         guardés, la nova es trobaria el no d'abans. */
+      return { ok:false, error:'La sessió ha caducat. Torna a entrar amb Google.', _caducat:true };
+    }
+    dades = JSON.parse(r.getContentText());
+  } catch (e) {
+    /* No s'ha pogut parlar amb Google. NO es deixa passar —seria la manera
+       més fàcil de saltar-s'ho: només cal fer caure aquella crida— però es
+       diu que és cosa del servidor i no d'ella. */
+    return { ok:false, error:'Ara mateix no es pot comprovar qui ets. Torna-ho a provar d\'aquí a un moment.' };
+  }
+
+  var emissorOk = dades.iss === 'accounts.google.com' || dades.iss === 'https://accounts.google.com';
+  if (!emissorOk) return { ok:false, error:'Credencial no vàlida.' };
+  if (clientId && dades.aud !== clientId) {
+    return { ok:false, error:'Aquesta credencial no és d\'aquesta app.' };
+  }
+  if (String(dades.email_verified) !== 'true') {
+    return { ok:false, error:'Aquest correu de Google no està verificat.' };
+  }
+  if (Number(dades.exp || 0) * 1000 < Date.now()) {
+    return { ok:false, error:'La sessió ha caducat. Torna a entrar amb Google.', _caducat:true };
+  }
+  /* El domini. Es miren les dues coses: el camp `hd`, que Google només posa
+     als comptes de Workspace, I el final del correu. Amb una de sola no n'hi
+     hauria prou: un Gmail pot tenir el correu que vulgui a la part de davant,
+     però mai no tindrà el `hd` de l'escola. */
+  var correu = String(dades.email || '').toLowerCase();
+  if (domini) {
+    var dom = domini.toLowerCase();
+    if (String(dades.hd || '').toLowerCase() !== dom || correu.slice(-(dom.length + 1)) !== '@' + dom) {
+      return { ok:false, error:'A aquesta app només s\'hi pot entrar amb el compte @' + domini + '.' };
+    }
+  }
+
+  var bo = { ok:true, email: correu };
+  try {
+    if (cache) {
+      /* Fins que caduqui la credencial, i mai més de cinquanta minuts. */
+      var queda = Math.floor(Number(dades.exp || 0) - (Date.now() / 1000));
+      cache.put(empremta, JSON.stringify(bo), Math.max(60, Math.min(queda, 3000)));
+    }
+  } catch (e) {}
+  return bo;
+}
+
 const TABS = { alumnes: 'Alumnes', registre: "Registres d'aula" };
 
 /* Quina pestanya de registres toca.
@@ -2776,6 +2925,26 @@ function handleRequest(e) {
         .setMimeType(ContentService.MimeType.JSON);
     }
 
+    /* ── QUI TRUCA (veure `_loginComprova`) ────────────────────────────
+       Només a les mestres que tinguin `LOGIN_DOMINI` a les seves Script
+       Properties. A la resta, aquestes quatre línies no fan res i el
+       servidor es comporta exactament com sempre.
+
+       Va DESPRÉS del token i no abans: així, qui ni tan sols té el token
+       no fa gastar una crida a Google. I va DESPRÉS de les dues accions
+       de les famílies, que són més amunt, perquè qui reserva hora no té
+       ni compte de l'escola ni app. */
+    var _loginDom = _loginDomini();
+    if (_loginDom) {
+      var _qui = _loginComprova((body && body.idToken) || p.idToken || '',
+                                _loginDom, _loginClientId());
+      if (!_qui.ok) {
+        return ContentService
+          .createTextOutput(JSON.stringify({ ok:false, error:_qui.error, _loginError:true }))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+    }
+
 
     /* ⚠ LA MATEIXA OPERACIÓ, UN SOL COP.
 
@@ -2863,6 +3032,8 @@ function handleRequest(e) {
       case 'resumEntrevistes':   result = resumEntrevistes(ss); break;
       case 'loadRegistreDocents': result = loadRegistreDocents(ss); break;
       case 'saveRegistreDocents': result = saveRegistreDocents(ss, body && body.items, body && body.data, body && body.base); break;
+      case 'loadHorariClaustre': result = loadHorariClaustre(ss); break;
+      case 'saveHorariClaustre': result = saveHorariClaustre(ss, body && body.mestres, body && body.curs, body && body.per); break;
       case 'getNotesCompartides':  result = getNotesCompartides(ss, (body&&body.grup)||p.grup); break;
       case 'loadCompartirNotes':   result = loadCompartirNotes(ss, (body&&body.grup)||p.grup, (body&&body.matKey)||p.matKey); break;
       case 'saveCompartirNotes':   result = saveCompartirNotes(ss, body.grup, body.matKey, body.nomAssig, body.nomMestra, !!body.compartir); break;
@@ -6064,7 +6235,7 @@ function getOrCreateDataSheet(ss, nom) {
    enganxar el Code.gs nou NO n'hi ha prou, cal desplegar-ne una versió
    nova, i fins llavors tot es veu malament sense que ningú ho digui.
    ⚠ Puja-la al mateix temps que la del sw.js/versio.js/versio.json. */
-var BACKEND_VERSIO = 'v268';
+var BACKEND_VERSIO = 'v280';
 
 var MAX_CELA = 45000;
 
