@@ -1643,6 +1643,19 @@ async function _appsScriptGetXarxa(params, _retry = true, _fons = false) {
 }
 
 async function _appsScriptGetFetch(params, _retry = true) {
+  /* Si cal entrar i encara no se sap qui és, s'espera aquí. I si al final no
+     s'ha pogut entrar, NO s'envia: es contesta el mateix que contestaria el
+     servidor, que l'app ja sap tractar (es queda a la cua i es torna a provar
+     quan entri). Enviar-la seria gastar una crida que el servidor rebutjarà
+     igualment. Veure `loginEspera()` a js/login.js: hi passen TOTES, també
+     les dels mòduls que es posen en marxa pel seu compte en carregar-se. */
+  if (typeof loginCal === 'function' && loginCal()) {
+    try { await loginEspera(); } catch (e) {}
+    if (typeof loginToken === 'function' && !loginToken()) {
+      return { ok: false, _loginError: true,
+               error: 'Cal entrar amb el compte de l\'escola.' };
+    }
+  }
   const url = new URL(config.scriptUrl);
   /* ⚠ UN VALOR BUIT ARRIBAVA AL SERVIDOR COM EL TEXT «null».
 
@@ -1809,6 +1822,19 @@ function _posaOpId(body) {
 }
 
 async function _appsScriptPostFetch(body, _retry = true) {
+  /* Si cal entrar i encara no se sap qui és, s'espera aquí. I si al final no
+     s'ha pogut entrar, NO s'envia: es contesta el mateix que contestaria el
+     servidor, que l'app ja sap tractar (es queda a la cua i es torna a provar
+     quan entri). Enviar-la seria gastar una crida que el servidor rebutjarà
+     igualment. Veure `loginEspera()` a js/login.js: hi passen TOTES, també
+     les dels mòduls que es posen en marxa pel seu compte en carregar-se. */
+  if (typeof loginCal === 'function' && loginCal()) {
+    try { await loginEspera(); } catch (e) {}
+    if (typeof loginToken === 'function' && !loginToken()) {
+      return { ok: false, _loginError: true,
+               error: 'Cal entrar amb el compte de l\'escola.' };
+    }
+  }
   if (_retry) _posaOpId(body);     // només al primer intent: el reintent el reaprofita
   const ctrl = new AbortController();
   const timeout = setTimeout(() => ctrl.abort(), 45000);
@@ -2266,6 +2292,15 @@ function _finalitzaRefresc(resposta) {
   const haFallat = !resposta || resposta.ok === false || resposta._networkError || resposta._authError;
   const pendents = (typeof _pendents !== 'undefined' && _pendents) ? _pendents.length : 0;
   if (haFallat) {
+    /* La credencial de Google ha caducat amb l'app oberta. Es renova en
+       silenci i NO es diu «sense connexió», que seria mentida i la faria
+       mirar el wifi quan el wifi va bé. */
+    if (resposta && resposta._loginError) {
+      try { if (typeof loginCaducat === 'function') loginCaducat(); } catch (e) {}
+      updateSync('error', 'Tornant a entrar…');
+      if (pendents && typeof _pendentsEngegaRellotge === 'function') _pendentsEngegaRellotge();
+      return;
+    }
     updateSync('error', resposta && resposta._authError ? 'No autoritzat' : 'Sense connexió');
     if (typeof _avisDadesVelles === 'function' && students.length) {
       _avisDadesVelles(resposta && resposta._authError ? 'auth' : 'network');
@@ -4411,6 +4446,36 @@ function _casellesTreu(enviades) {
   _casellesGuarda();
 }
 
+/* ⚠ UN «NO» QUE ES POT ARREGLAR SOL NO POT ESBORRAR LA FEINA DE LA CUA.
+
+   La cua guarda el que la mestra ha fet i encara no ha arribat al full (una
+   creu marcada amb mala cobertura, una nota acabada d'entrar). Quan el
+   servidor contesta que no, s'ha de decidir: ho tornem a provar, o ho donem
+   per impossible i ho traiem? Si es treu, allò s'ha perdut per sempre.
+
+   Hi ha dos «no» que NO són impossibles, i els dos s'arreglen sols:
+     · `_authError` — el token encara no hi era o s'acabava de canviar;
+     · `_loginError` — la credencial de Google ha caducat mentre l'app era
+       oberta. L'app en demana una de nova en silenci i el següent intent
+       passa.
+
+   ⚠ El segon es va trobar JUST ABANS d'encendre el login (15/10/2026) i és
+   per poc: `_loginError` ve amb `ok:false`, o sigui que queia al calaix de
+   «el full no hi és» i la cua s'esborrava. Una mestra que passés notes amb
+   l'app oberta de feia una hora les hauria perdudes totes, amb un avís que
+   li deia de refrescar la pàgina. */
+function _esTornaraAProvar(r) {
+  if (!r) return false;
+  if (r._authError) return true;             // l'avís de clau ja surt sol
+  if (r._loginError) {
+    /* Es demana una credencial nova de seguida: si no, el reintent tornaria
+       a trobar-se el mateix i la cua no s'acabaria de buidar mai. */
+    try { if (typeof loginCaducat === 'function') loginCaducat(); } catch (e) {}
+    return true;
+  }
+  return false;
+}
+
 async function _casellesEnviaTros(tros) {
   const primer = tros[0];
   if (primer.tipus !== 'notes' && primer.tipus !== 'registre') return _casellesEnviaColumna(primer);
@@ -4427,7 +4492,7 @@ async function _casellesEnviaTros(tros) {
   if (_casellesServidorVell) return _casellesUnaAUna(tros);
 
   if (!r || r._networkError) return 'xarxa';
-  if (r._authError) return 'xarxa';          // es reintentarà; l'avís de clau ja surt sol
+  if (_esTornaraAProvar(r)) return 'xarxa';
   /* El servidor ha vist que algú ha mogut una columna mentre desava i no ha
      donat les notes per bones. No es perden: es queden apuntades i es tornen a
      enviar de seguida, quan el mapa de columnes ja serà el bo (27/9/2026). */
@@ -4473,7 +4538,7 @@ async function _casellesUnaAUna(tros) {
                                    value: c.value, grup: x.grup, nomAlumne: c.nomAlumne });
       }
     } catch (err) { return 'xarxa'; }
-    if (!r || r._networkError || r._authError) return 'xarxa';
+    if (!r || r._networkError || _esTornaraAProvar(r)) return 'xarxa';
     if (r.ok === false) _casellesFalla(e, r);
     _casellesTreu([e]);
   }
@@ -4512,7 +4577,7 @@ async function _casellesEnviaColumna(e) {
       r = await appsScriptPost({ action: 'deleteRegistreItem', itemId: c.itemId, grup: x.grup });
     }
   } catch (err) { return 'xarxa'; }
-  if (!r || r._networkError || r._authError) return 'xarxa';
+  if (!r || r._networkError || _esTornaraAProvar(r)) return 'xarxa';
   if (r.ok === false) {
     _casellesTreu([e]);
     showToast('No s\'ha pogut crear la columna «' + ((c.item && c.item.nom) || '') + '»: ' +
