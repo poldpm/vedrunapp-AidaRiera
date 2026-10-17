@@ -277,3 +277,83 @@ Quan s'hagi d'oferir a més gent, es mou l'entrada a `js/millores.js` amb
 **Depèn de:** només pantalla. La mestra no ha de fer res: s'encén posant-li
 l'interruptor al seu `js/personal.js`. El `Code.gs` ja ho porta des de la v268,
 o sigui que no cal redesplegar res.
+
+## `eines-targetes` — Les eines, en targetes
+
+**Què fa:** el menú «Eines» deixa de desplegar-se i passa a obrir una pàgina
+amb una targeta per eina.
+
+**Fitxers:**
+- `index.html` — un `<a id="navEinesPagina">` que neix amagat (el botó del
+  menú) i la pàgina `#page-eines` amb la graella buida `#einesGraella`.
+- `js/app.js` — `einesPaginaHiEs()`, `einesAplicaInterficie()` (que es crida
+  a l'arrencada, després de les eines que s'encenen una a una),
+  `renderEines()`, la taula `EINES_DESC` i dues línies a `showPage()`: la
+  redirecció de `#eines` a l'inici quan l'interruptor és apagat, i la pintada.
+- `css/main.css` — `.eines-graella`, `.eina-card…`, `.eines-buit`.
+- `eines/comprova-eines.js` — el banc, dins de `prova-tot.js`.
+- `manual.html` — apartat «Les eines, en targetes (opcional)» i una fila a la
+  taula de «Personalitzar l'app».
+
+**Com funciona:** l'interruptor és `window.EINES_PAGINA = true` al
+`js/personal.js` de la mestra. `einesAplicaInterficie()` ensenya el botó nou i
+amaga el desplegable, o al revés. `renderEines()` **no té la llista d'eines
+escrita**: la llegeix dels botons del desplegable (`#einesItems`), que és on
+viu de debò, i en treu la icona, el rètol i la pàgina que obren. De
+`EINES_DESC` només en surt la línia del que fa cada eina.
+
+**Paranys:**
+- La llista no es podia escriure a mà: el dia que s'afegís una eina al menú, la
+  pàgina s'hauria quedat sense la seva targeta i no ho hauria dit ningú. Com
+  que surt dels botons, **les eines que la mestra no té no hi surten soles**:
+  el seu botó del menú ja està amagat (la distribució de l'aula a una
+  especialista, les rúbriques a qui no les ha demanades). Per això
+  `einesAplicaInterficie()` es crida DESPRÉS de `_rolAplicaInterficie()` i de
+  `RubAvalUI.aplicaInterficie()`.
+- Amagar el calaix `#einesItems` **no** amaga els botons de dins un per un:
+  el seu `style.display` es queda com estava, que és justament el que
+  `renderEines()` llegeix. Si algun dia s'amaguessin d'un en un, la pàgina es
+  quedaria buida.
+- `#eines` havia de redirigir a l'inici a qui no té l'interruptor, com ja fa
+  `#rubaval`: si no, l'adreça portava a una pàgina en blanc.
+- Al mòbil les targetes van de dues en dues i s'hi amaga el text: amb una sola
+  columna, arribar a l'última eina era mitja pantalla de baixar.
+
+**Depèn de:** només pantalla. La mestra no ha de fer res: s'encén posant-li
+l'interruptor al seu `js/personal.js`. No toca el `Code.gs`.
+
+### `eines-targetes` · l'afegit del 17/10/2026 — «Tinc una idea!»
+
+**Què fa:** l'última targeta de la pàgina d'Eines no obre cap eina: obre una
+finestra on la mestra explica el que li faria servei, i li arriba un correu a
+en Pol (com el «Jo la vull!» de les possibles actualitzacions).
+
+**Fitxers:**
+- `index.html` — la finestra `#ideaOverlay` amb el camp `#ideaText`.
+- `js/app.js` — la targeta al final de `renderEines()` (sempre, encara que no
+  hi hagi cap eina) i `obreIdea()` / `tancaIdea()` / `ideaEnvia()`.
+- `css/main.css` — `.eina-card-idea`: sense fons i amb la vora de ratlletes.
+- `Code.gs` — l'acció `enviaIdea` i la funció del mateix nom, al costat del
+  `demanaMillora` i amb el mateix `_milloraCorreu_()`.
+- `js/versio.js` — `BACKEND_MINIM` puja a v290 (veure Paranys).
+
+**Com funciona:** el navegador envia `{action:'enviaIdea', qui, idea}` i el
+servidor li engega un correu a en Pol amb l'assumpte «Tinc una idea! (Nom
+Cognom)», el text sencer i el compte de Google de debò de qui l'envia (el del
+perfil pot estar mal escrit; el de `Session.getActiveUser()` no menteix).
+
+**Paranys:**
+- **No es marca enlloc com a «demanada».** No surt de cap llista: se'n poden
+  enviar tantes com vulgui, i una idea que no es pogués repetir seria una
+  trampa.
+- Si el correu **no** surt, la finestra **no es tanca** i el que ha escrit s'hi
+  queda. Tancar-la diria que en Pol ho sap quan no ho sabria ningú, i a sobre
+  li hauria fet perdre el text.
+- És una **acció nova al `Code.gs`**: amb el servidor d'abans, el botó no pot
+  funcionar. Per això `BACKEND_MINIM` puja a v290 i surt la franja groga fins
+  que la biblioteca està al dia. S'enganxa **un sol cop** i val per a totes.
+- El correu es **talla als 4.000 caràcters**: un correu no és on abocar-hi un
+  document sencer.
+
+**Depèn de:** també `Code.gs`. La mestra no ha de fer res; en Pol enganxa la
+biblioteca un sol cop i arriba a totes alhora.

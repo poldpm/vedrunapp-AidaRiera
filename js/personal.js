@@ -910,3 +910,19 @@
    es pot treure d'aquí quan ja faci temps que el va llegir.
    ============================================================ */
 window.AVIS_INICI = 'adeu-assistent';
+
+/* ============================================================
+   LES EINES, EN TARGETES
+   ------------------------------------------------------------
+   El botó «Eines» del menú deixa de ser un desplegable i obre una
+   pàgina amb una targeta per eina. L'última targeta, «Tinc una
+   idea!», és per demanar-ne una que encara no existeix.
+
+   El codi és al base de totes les apps des de la v289, però neix
+   APAGAT: canviar-li el menú a una mestra sense avisar-la és fer-li
+   buscar on han anat a parar les seves eines. Es va provar primer a
+   l'app d'en Pol (v289–v292) i s'encén a tothom el 17/10/2026.
+
+   Veure la recepta del `MILLORES.md` (`eines-targetes`).
+   ============================================================ */
+window.EINES_PAGINA = true;
