@@ -913,6 +913,70 @@ window.EINES_AULES = true;
 
 
 /* ============================================================
+   L'ACTITUD, FORA DEL SEU REGISTRE
+   ------------------------------------------------------------
+   En Pol, 21/10/2026: «l'Aida no vol tenir la columna d'actitud, no la vol
+   avaluar com fa la app, m'ha dit que ja es crearà ella l'ítem a la
+   categoria que ella vulgui».
+
+   L'app porta de sèrie una columna «Actitud» que es posa sola a tots els
+   registres: no la crea la mestra, no es pot esborrar, pesa 2 i la nota surt
+   de la mitjana d'uns aspectes que es puntuen en un quadre a part. A ella no
+   li encaixa: amb les categories, l'actitud és una activitat més dins de la
+   categoria que ella decideixi, amb el pes que li doni el % d'aquella
+   categoria. Posant-se-la ella a «Nou ítem» té exactament això.
+
+   Per tant, aquí es treuen les TRES maneres d'arribar-hi, que si no quedarien
+   fent d'esquer cap a una puntuació que ja no compta enlloc:
+     1. la columna del registre (el base la torna a injectar cada cop que es
+        refresquen les notes, o sigui que no n'hi ha prou de treure-la un cop:
+        es desactiva qui la posa);
+     2. el botó «Actitud» de la capçalera del registre;
+     3. «Aspectes d'actitud», a Configuració → Les meves coses, que només
+        servia per triar què es puntuava en aquell quadre.
+
+   ⚠ NO S'ESBORRA CAP DADA. El que hi hagi puntuat segueix al seu full i al
+   navegador; això només ho treu de la vista. Si algun dia ho vol recuperar,
+   n'hi ha prou amb treure aquest bloc.
+
+   ⚠ Es fa des d'aquí i no tocant `index.html` ni `js/notes.js`: si es
+   toquessin dins de la seva carpeta, aquells fitxers deixarien de rebre
+   arranjaments per sempre (veure FILLES.md).
+   ============================================================ */
+(function () {
+  /* 1. La columna. `_injectActitudItem` és qui la posa, i el base la crida a
+     cada obertura i a cada refresc de fons. Substituir-la per una que la
+     TREU deixa el registre net les tres vegades. */
+  window._injectActitudItem = function () {
+    try {
+      if (typeof notesItems !== 'undefined' && Array.isArray(notesItems)) {
+        notesItems = notesItems.filter(function (i) { return i && i.id !== 'actitud_ref'; });
+      }
+      if (typeof notesValors !== 'undefined' && notesValors) delete notesValors['actitud_ref'];
+    } catch (e) {}
+  };
+
+  /* 2 i 3. Els dos botons. No tenen `id`, o sigui que es busquen pel que
+     criden; així no depèn de com estiguin ordenats ni del seu rètol. */
+  function _amaga(zona, crida) {
+    var bs = document.querySelectorAll(zona + ' button');
+    for (var i = 0; i < bs.length; i++) {
+      if ((bs[i].getAttribute('onclick') || '').indexOf(crida) !== -1) {
+        bs[i].style.display = 'none';
+      }
+    }
+  }
+  function _arrenca() {
+    _amaga('#page-notes .notes-header-actions', 'openActitudPanel');
+    /* La Configuració és una finestra (`#configOverlay`), no una pàgina. */
+    _amaga('#configOverlay', 'obreAspectes');
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _arrenca);
+  else _arrenca();
+})();
+
+
+/* ============================================================
    L'AVÍS DE L'INICI
    ------------------------------------------------------------
    La targeta vermella de sobre «Possibles actualitzacions». El

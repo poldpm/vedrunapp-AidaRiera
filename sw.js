@@ -1,5 +1,15 @@
 /* Service Worker — cache PWA + notificacions a les 7h */
-const CACHE = 'vedruna-v306';
+/* ⚠ El sufix «-actitud» és NOMÉS d'aquesta app i és temporal (21/10/2026).
+   El seu `manual.html` és propi i se li ha canviat sense que la mare pugés
+   de versió; com que els fitxers es serveixen del cache primer, sense un nom
+   de cache nou seguiria llegint el manual vell. Canviant-lo, el service
+   worker es torna a baixar tot i el manual nou li arriba.
+   NO s'han tocat `js/versio.js` ni `versio.json` a posta: si s'haguessin
+   mogut, l'avís de versió nova diria una versió que no existeix.
+   El pròxim `sync-filla.js` tornarà a posar aquesta línia com a la mare
+   (aquest fitxer no és dels seus `propis`), i no passa res: el manual nou ja
+   serà al cache i, de totes maneres, viu al seu repositori. */
+const CACHE = 'vedruna-v306-actitud';
 const ASSETS = [
   './', './index.html', './manual.html', './css/main.css',
   './js/espera.js', './js/pdfhorari.js', './js/millores.js', './js/rol.js', './js/config.local.js', './js/login.js', './js/app.js', './js/notes.js', './js/seients.js', './js/perfil.js', './js/grupview.js', './js/postits.js', './js/horari.js', './js/gwrite.js', './js/rubriques.js', './js/docents.js', './js/coordinacio.js', './js/regdocents.js', './js/segentrevistes.js', './js/horariclaustre-dades.js', './js/horariclaustre.js', './js/entrevistes.js', './js/notescomp.js', './js/reunions.js', './js/versio.js',
