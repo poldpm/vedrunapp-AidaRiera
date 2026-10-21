@@ -23,7 +23,7 @@
    neix apagat: cada mestra només veu les que ha demanat. Aquí és on
    s'encenen les seves.
 
-   ARA MATEIX NO EN TÉ CAP D'ENCESA, i és a posta.
+   ARA MATEIX HI TÉ ENCESES: les AULES LLIURES (aquí sota).
 
    ⚠ Les RÚBRIQUES D'AVALUACIÓ es van encendre el 29/9/2026 i es van tornar
    a apagar el mateix dia. En Pol: «jo vull que la tingui com a actualització
@@ -38,6 +38,23 @@
 
        // window.EINES_RUBAVAL = true;
    ============================================================ */
+
+/* AULES LLIURES — la va demanar i se li va encendre el 21/10/2026.
+
+   Li surt a Eines → Aules lliures: tria «Ara mateix» o un altre dia i hora,
+   clica Cercar i li diu quines aules auxiliars estan buides i fins a quina
+   hora. No reserva res: només llegeix l'horari d'aules auxiliars de l'escola.
+
+   Això és l'únic que calia: la resta del codi ja li arriba amb el sync i neix
+   apagat. Encendre-ho també fa que «Possibles actualitzacions» li digui
+   «Ja la tens ✓» en lloc de tornar-li a oferir (ho sap per l'interruptor que
+   el catàleg declara a `js/millores.js`).
+
+   ⚠ Si li diu que el servidor no coneix l'acció, o que no hi ha el full de les
+   aules, NO és cosa d'aquesta línia: és que al seu Apps Script hi falta la
+   biblioteca al dia o la propietat `AULES_FULL`. Veure MILLORES.md, apartat
+   `aules-lliures`. */
+window.EINES_AULES = true;
 
 /* ============================================================
    EL REGISTRE DE NOTES PER CATEGORIES
