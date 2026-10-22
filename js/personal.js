@@ -23,7 +23,7 @@
    neix apagat: cada mestra només veu les que ha demanat. Aquí és on
    s'encenen les seves.
 
-   ARA MATEIX NO EN TÉ CAP D'ENCESA, i és a posta.
+   ARA MATEIX HI TÉ ENCESES: les AULES LLIURES (aquí sota).
 
    ⚠ Les RÚBRIQUES D'AVALUACIÓ es van encendre el 29/9/2026 i es van tornar
    a apagar el mateix dia. En Pol: «jo vull que la tingui com a actualització
@@ -38,6 +38,23 @@
 
        // window.EINES_RUBAVAL = true;
    ============================================================ */
+
+/* AULES LLIURES — la va demanar i se li va encendre el 21/10/2026.
+
+   Li surt a Eines → Aules lliures: tria «Ara mateix» o un altre dia i hora,
+   clica Cercar i li diu quines aules auxiliars estan buides i fins a quina
+   hora. No reserva res: només llegeix l'horari d'aules auxiliars de l'escola.
+
+   Això és l'únic que calia: la resta del codi ja li arriba amb el sync i neix
+   apagat. Encendre-ho també fa que «Possibles actualitzacions» li digui
+   «Ja la tens ✓» en lloc de tornar-li a oferir (ho sap per l'interruptor que
+   el catàleg declara a `js/millores.js`).
+
+   ⚠ Si li diu que el servidor no coneix l'acció, o que no hi ha el full de les
+   aules, NO és cosa d'aquesta línia: és que al seu Apps Script hi falta la
+   biblioteca al dia o la propietat `AULES_FULL`. Veure MILLORES.md, apartat
+   `aules-lliures`. */
+window.EINES_AULES = true;
 
 /* ============================================================
    EL REGISTRE DE NOTES PER CATEGORIES
@@ -890,6 +907,70 @@
   }
 
   function _arrenca() { _posaEstils(); _posaBoto(); _vigilaQuadreRubrica(); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _arrenca);
+  else _arrenca();
+})();
+
+
+/* ============================================================
+   L'ACTITUD, FORA DEL SEU REGISTRE
+   ------------------------------------------------------------
+   En Pol, 21/10/2026: «l'Aida no vol tenir la columna d'actitud, no la vol
+   avaluar com fa la app, m'ha dit que ja es crearà ella l'ítem a la
+   categoria que ella vulgui».
+
+   L'app porta de sèrie una columna «Actitud» que es posa sola a tots els
+   registres: no la crea la mestra, no es pot esborrar, pesa 2 i la nota surt
+   de la mitjana d'uns aspectes que es puntuen en un quadre a part. A ella no
+   li encaixa: amb les categories, l'actitud és una activitat més dins de la
+   categoria que ella decideixi, amb el pes que li doni el % d'aquella
+   categoria. Posant-se-la ella a «Nou ítem» té exactament això.
+
+   Per tant, aquí es treuen les TRES maneres d'arribar-hi, que si no quedarien
+   fent d'esquer cap a una puntuació que ja no compta enlloc:
+     1. la columna del registre (el base la torna a injectar cada cop que es
+        refresquen les notes, o sigui que no n'hi ha prou de treure-la un cop:
+        es desactiva qui la posa);
+     2. el botó «Actitud» de la capçalera del registre;
+     3. «Aspectes d'actitud», a Configuració → Les meves coses, que només
+        servia per triar què es puntuava en aquell quadre.
+
+   ⚠ NO S'ESBORRA CAP DADA. El que hi hagi puntuat segueix al seu full i al
+   navegador; això només ho treu de la vista. Si algun dia ho vol recuperar,
+   n'hi ha prou amb treure aquest bloc.
+
+   ⚠ Es fa des d'aquí i no tocant `index.html` ni `js/notes.js`: si es
+   toquessin dins de la seva carpeta, aquells fitxers deixarien de rebre
+   arranjaments per sempre (veure FILLES.md).
+   ============================================================ */
+(function () {
+  /* 1. La columna. `_injectActitudItem` és qui la posa, i el base la crida a
+     cada obertura i a cada refresc de fons. Substituir-la per una que la
+     TREU deixa el registre net les tres vegades. */
+  window._injectActitudItem = function () {
+    try {
+      if (typeof notesItems !== 'undefined' && Array.isArray(notesItems)) {
+        notesItems = notesItems.filter(function (i) { return i && i.id !== 'actitud_ref'; });
+      }
+      if (typeof notesValors !== 'undefined' && notesValors) delete notesValors['actitud_ref'];
+    } catch (e) {}
+  };
+
+  /* 2 i 3. Els dos botons. No tenen `id`, o sigui que es busquen pel que
+     criden; així no depèn de com estiguin ordenats ni del seu rètol. */
+  function _amaga(zona, crida) {
+    var bs = document.querySelectorAll(zona + ' button');
+    for (var i = 0; i < bs.length; i++) {
+      if ((bs[i].getAttribute('onclick') || '').indexOf(crida) !== -1) {
+        bs[i].style.display = 'none';
+      }
+    }
+  }
+  function _arrenca() {
+    _amaga('#page-notes .notes-header-actions', 'openActitudPanel');
+    /* La Configuració és una finestra (`#configOverlay`), no una pàgina. */
+    _amaga('#configOverlay', 'obreAspectes');
+  }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _arrenca);
   else _arrenca();
 })();
