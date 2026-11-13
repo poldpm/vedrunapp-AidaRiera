@@ -56,6 +56,24 @@
    `aules-lliures`. */
 window.EINES_AULES = true;
 
+/* LA MEVA LLIBRETA — feta per a ella i encesa el 13/11/2026.
+
+   Ho va demanar ella: «des que tinc l'app he llençat la llibreta de paper,
+   però em falta un lloc on apuntar-me coses» —el que es diu a les reunions
+   de cicle, els acords, el que ha de tenir en compte—. Ho portava en una
+   llibreta de mà i en un Excel que se li trepitjava entre l'ordinador i el
+   mòbil.
+
+   Li surt a Eines → La meva llibreta: escriu, es desa amb el dia posat, es
+   cerca, i de qualsevol línia en pot fer una tasca o un event del calendari
+   amb un botó (s'obre la finestra de sempre amb el text ja posat).
+
+   ⚠ Si li diu que el que escriu es queda en aquest aparell, NO és cosa
+   d'aquesta línia: és que al seu Apps Script hi falta la biblioteca al dia
+   (la llibreta es desa amb `saveLlibreta`, que hi va entrar a la v362).
+   Veure MILLORES.md, apartat `la-meva-llibreta`. */
+window.EINES_LLIBRETA = true;
+
 /* ============================================================
    EL REGISTRE DE NOTES PER CATEGORIES
    ------------------------------------------------------------
